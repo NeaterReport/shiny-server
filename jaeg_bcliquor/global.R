@@ -31,7 +31,7 @@ library(shinythemes)
 library(sortableR)
 library(stringr)
 library(scales)
-library(treemapify)
+# library(treemapify)
 
 
 # ---- Import geocoded country ----
@@ -118,6 +118,244 @@ ggtify <- function (treeMap, label.groups = TRUE) {
     Plot <- Plot + scale_size(range = c(1, 8), guide = FALSE)
   }
   return(Plot)
+}
+
+# treempaify fn
+
+treemapify <- function (data, area, fill, group = FALSE, label = FALSE, xlim = c(0, 
+                                                                   100), ylim = c(0, 100))
+{
+  require(ggplot2)
+  require(plyr)
+  require(reshape2)
+  if (missing(data) || is.data.frame(data) == FALSE) {
+    stop("Must provide data")
+  }
+  if (missing(area) || area %in% colnames(data) == FALSE) {
+    stop("Must specify an area aesthetic with area=\"colname\" (and it must exist in the data frame)")
+  }
+  if (missing(fill) || fill %in% colnames(data) == FALSE) {
+    stop("Must specify a fill aesthetic with fill=\"colname\" (and it must exist in the data frame)")
+  }
+  if (missing(group) == FALSE && group %in% colnames(data) == 
+      FALSE) {
+    stop("If you want a group aesthetic (optional), it must be specified with group=\"colname\" (and it must exist in the data frame)")
+  }
+  if (missing(group) == FALSE && is.factor(data[[group]]) == 
+      FALSE) {
+    stop("Group aesthetic must be a factor")
+  }
+  if (missing(label) == FALSE && label %in% colnames(data) == 
+      FALSE) {
+    stop("If you want labels (optional), they must be specified with label=\"colname\" (and the column must exist in the data frame)")
+  }
+  if (missing(label) == FALSE && is.factor(data[[label]]) == 
+      FALSE) {
+    stop("Label column must be a factor")
+  }
+  if (is.numeric(xlim) == FALSE || length(xlim) != 2) {
+    stop("Invalid xlim (try something like \"xlim=c(0,100)\")")
+  }
+  if (is.numeric(ylim) == FALSE || length(ylim) != 2) {
+    stop("Invalid ylim (try something like \"ylim=c(0,100)\")")
+  }
+  if (missing(group) == FALSE) {
+    if (missing(label)) {
+      treeMapData <- data.frame(area = data[area], fill = data[fill], 
+                                group = data[group])
+      names(treeMapData) <- c("area", "fill", "group")
+    }
+    else {
+      treeMapData <- data.frame(area = data[area], fill = data[fill], 
+                                group = data[group], label = data[label])
+      names(treeMapData) <- c("area", "fill", "group", 
+                              "label")
+    }
+    plotArea <- prod(diff(xlim), diff(ylim))
+    scaleFactor <- plotArea/sum(treeMapData$area)
+    treeMapData$area <- scaleFactor * treeMapData$area
+    groupData <- ddply(treeMapData, "group", summarise, area = sum(area), 
+                       fill = group[1])
+    groupTreeMap <- treemapify(groupData, area = "area", 
+                               fill = "fill", xlim = xlim, ylim = ylim)
+    if (missing(label)) {
+      treeMap <- data.frame(area = numeric(), fill = factor(), 
+                            group = factor(), xmin = numeric(), xmax = numeric(), 
+                            ymin = numeric(), ymax = numeric())
+    }
+    else {
+      treeMap <- data.frame(area = numeric(), fill = factor(), 
+                            group = factor(), label = character(), xmin = numeric(), 
+                            xmax = numeric(), ymin = numeric(), ymax = numeric())
+    }
+    for (thisGroup in groupTreeMap[["fill"]]) {
+      xmin <- as.numeric(groupTreeMap[groupTreeMap[, "fill"] == 
+                                        thisGroup, ]["xmin"])
+      xmax <- as.numeric(groupTreeMap[groupTreeMap[, "fill"] == 
+                                        thisGroup, ]["xmax"])
+      ymin <- as.numeric(groupTreeMap[groupTreeMap[, "fill"] == 
+                                        thisGroup, ]["ymin"])
+      ymax <- as.numeric(groupTreeMap[groupTreeMap[, "fill"] == 
+                                        thisGroup, ]["ymax"])
+      thisGroupData <- treeMapData[treeMapData[, "group"] == 
+                                     thisGroup, ]
+      if (missing(label)) {
+        thisGroupRects <- treemapify(thisGroupData, fill = "fill", 
+                                     area = "area", xlim = c(xmin, xmax), ylim = c(ymin, 
+                                                                                   ymax))
+      }
+      else {
+        thisGroupRects <- treemapify(thisGroupData, fill = "fill", 
+                                     area = "area", label = "label", xlim = c(xmin, 
+                                                                              xmax), ylim = c(ymin, ymax))
+      }
+      thisGroupRects["group"] <- thisGroup
+      treeMap <- rbind(treeMap, thisGroupRects)
+    }
+    attr(treeMap, "fillName") <- fill
+    treeMap$area <- NULL
+    return(treeMap)
+  }
+  if (missing(label)) {
+    treeMapData <- data.frame(area = data[area], fill = data[fill])
+    names(treeMapData) <- c("area", "fill")
+  }
+  else {
+    treeMapData <- data.frame(area = data[area], fill = data[fill], 
+                              label = data[label])
+    names(treeMapData) <- c("area", "fill", "label")
+  }
+  treeMapData <- treeMapData[with(treeMapData, order(-area)), 
+                             ]
+  plotArea <- prod(diff(xlim), diff(ylim))
+  scaleFactor <- plotArea/sum(treeMapData$area)
+  treeMapData$area <- scaleFactor * treeMapData$area
+  if (missing(label)) {
+    treeMap <- data.frame(area = numeric(), fill = factor(), 
+                          xmin = numeric(), xmax = numeric(), ymin = numeric(), 
+                          ymax = numeric())
+  }
+  else {
+    treeMap <- data.frame(area = numeric(), fill = factor(), 
+                          label = character(), xmin = numeric(), xmax = numeric(), 
+                          ymin = numeric(), ymax = numeric())
+  }
+  emptyxMin <- xlim[1]
+  emptyxMax <- xlim[2]
+  emptyyMin <- ylim[1]
+  emptyyMax <- ylim[2]
+  stackPointer <- 1
+  continue <- TRUE
+  while (continue) {
+    nInRow <- 1
+    emptyx <- emptyxMax - emptyxMin
+    emptyy <- emptyyMax - emptyyMin
+    if (emptyx > emptyy) {
+      subdivideDirection <- "horizontal"
+    }
+    else if (emptyx < emptyy) {
+      subdivideDirection <- "vertical"
+    }
+    else if (emptyx == emptyy) {
+      subdivideDirection <- "horizontal"
+    }
+    if (subdivideDirection == "horizontal") {
+      rowLongDimension = emptyyMax - emptyyMin
+    }
+    else {
+      rowLongDimension = emptyxMax - emptyxMin
+    }
+    lastAspectRatio <- Inf
+    stackPointerRow <- stackPointer
+    while (continue) {
+      if (missing(label)) {
+        treeMapRow <- data.frame(area = numeric(), fill = factor(), 
+                                 xmin = numeric(), xmax = numeric(), ymin = numeric(), 
+                                 ymax = numeric())
+      }
+      else {
+        treeMapRow <- data.frame(area = numeric(), fill = factor(), 
+                                 label = character(), xmin = numeric(), xmax = numeric(), 
+                                 ymin = numeric(), ymax = numeric())
+      }
+      stackPointer <- stackPointerRow
+      totalRowArea <- sum(treeMapData$area[stackPointer:(stackPointer + 
+                                                           nInRow - 1)])
+      rowShortDimension <- totalRowArea/rowLongDimension
+      if (subdivideDirection == "horizontal") {
+        rowPlacePointer <- emptyyMin
+      }
+      else {
+        rowPlacePointer <- emptyxMin
+      }
+      aspectRatio <- numeric()
+      for (i in 1:nInRow) {
+        thisRect <- treeMapData[stackPointer, ]
+        stackPointer <- stackPointer + 1
+        rectSubdivideLength <- thisRect$area/rowShortDimension
+        if (subdivideDirection == "horizontal") {
+          rectxMin <- emptyxMin
+          rectxMax <- emptyxMin + rowShortDimension
+          rectyMin <- rowPlacePointer
+          rectyMax <- rowPlacePointer + rectSubdivideLength
+          rowPlacePointer <- rectyMax
+        }
+        else {
+          rectxMin <- rowPlacePointer
+          rectxMax <- rowPlacePointer + rectSubdivideLength
+          rowPlacePointer <- rectxMax
+          rectyMin <- emptyyMin
+          rectyMax <- emptyyMin + rowShortDimension
+        }
+        if (missing(label)) {
+          newRect <- data.frame(area = thisRect$area, 
+                                fill = thisRect$fill, xmin = rectxMin, xmax = rectxMax, 
+                                ymin = rectyMin, ymax = rectyMax)
+        }
+        else {
+          newRect <- data.frame(area = thisRect$area, 
+                                fill = thisRect$fill, label = thisRect$label, 
+                                xmin = rectxMin, xmax = rectxMax, ymin = rectyMin, 
+                                ymax = rectyMax)
+        }
+        treeMapRow <- rbind(treeMapRow, newRect)
+        aspectRatio <- max(c(aspectRatio, rowShortDimension/rectSubdivideLength, 
+                             rectSubdivideLength/rowShortDimension))
+      }
+      if (aspectRatio > lastAspectRatio) {
+        stackPointer <- stackPointer - 1
+        treeMap <- rbind(treeMap, previousRow)
+        if (subdivideDirection == "horizontal") {
+          emptyxMin <- emptyxMin + previousShortDimension
+        }
+        else {
+          emptyyMin <- emptyyMin + previousShortDimension
+        }
+        continue <- FALSE
+      }
+      else {
+        if (stackPointer - 1 < nrow(treeMapData)) {
+          nInRow <- nInRow + 1
+          lastAspectRatio <- aspectRatio
+          previousRow <- treeMapRow
+          previousShortDimension <- rowShortDimension
+        }
+        else {
+          treeMap <- rbind(treeMap, treeMapRow)
+          continue <- FALSE
+        }
+      }
+    }
+    if (stackPointer - 1 == nrow(treeMapData)) {
+      continue <- FALSE
+    }
+    else {
+      continue <- TRUE
+    }
+  }
+  attr(treeMap, "fillName") <- fill
+  treeMap$area <- NULL
+  return(treeMap)
 }
 
 # ---- Create my own theme JAEG ^^ ----
