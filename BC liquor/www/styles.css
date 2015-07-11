@@ -1,0 +1,15 @@
+/* Float the image next to the text on tooltips */
+
+.tooltip_text {
+ float: left;
+}
+
+.tooltip_img {
+ float: left;
+ padding-right: 7px;
+ height: 130px;
+}
+
+p {
+  color: gray;
+}

@@ -1,0 +1,3 @@
+load("/Users/beneditochou/Desktop/PROTEST/Portfolio/BC liquor/www/geocoded_country.Rds")
+ls
+ls()
