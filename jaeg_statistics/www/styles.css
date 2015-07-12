@@ -1,0 +1,11 @@
+
+body {
+  background-color: #FFFAFF;
+}
+
+h2, h3 {
+  font-family: 'Dancing Script', cursive;
+  font-weight: 500;
+  line-height: 2;
+  color: darkgrey;
+}
