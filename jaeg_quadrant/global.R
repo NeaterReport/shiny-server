@@ -1,10 +1,10 @@
-# global for JAEG Quandrant Plot
+# global for JAEG Quadrant Plot
 
 # ---- Need More Emelie Solution! JAEG ----
 
 # To Do:
 # 1 - Dynamically fit n x n grid plot
-# 2 - Use the same colour for each quandrant for all plots
+# 2 - Use the same colour for each quadrant for all plots
 # 3 - Update the colour theme for the entire app
 # 4 - Find better ways to generate random names
 # 5 - More flexible way to explore the data
@@ -78,7 +78,7 @@ gen_rnorm <- function(v = 20, n = 100) {
 
 # ---- Fn to calculate means and correlation ----
 
-makeQuandrantData <- function(test_df = NULL, meancut, corcut) {
+makeQuadrantData <- function(test_df = NULL, meancut, corcut) {
   
   # Convert any factors back to numerics to calculate the cor
   test_df[sapply(test_df, is.factor)] <- lapply(test_df[sapply(test_df, is.factor)], as.numeric)
@@ -107,7 +107,7 @@ makeQuandrantData <- function(test_df = NULL, meancut, corcut) {
     median_cor <- median(q_df$cor) 
   }
   
-  # Assign group into quandrant for colouring
+  # Assign group into quadrant for colouring
   #  1 | 2
   #  - - -
   #  4 | 3

@@ -58,7 +58,7 @@ function(input, output, session) {
                          selected = NULL, server = TRUE)
   })
   
-# ----- Create Quandrant Data -----
+# ----- Create Quadrant Data -----
   
 # Solutions from Amber James, Thanks!
 # Use reactiveValues and ObserveEvent
@@ -82,8 +82,8 @@ function(input, output, session) {
     values$ycut <- NULL
   })
 
-  # Make Quandrant Plot
-  output$plot_quandrant <- renderPlot({
+  # Make Quadrant Plot
+  output$plot_quadrant <- renderPlot({
       
     # Check that user have selected a data first
     validate(
@@ -94,7 +94,7 @@ function(input, output, session) {
       
     # If you make the data here, it won't crash and will let you subset not sure why!
     # If you make the data outside of the same RenderPlot, it will crash ...
-    makeQuandrantData(data, meancut = values$xcut, corcut = values$ycut)
+    makeQuadrantData(data, meancut = values$xcut, corcut = values$ycut)
       
     # Need this so that the median will be use as cutoff when there is no user supplied vlaues
     if(is.null(values$xcut) & is.null(values$ycut)) {
