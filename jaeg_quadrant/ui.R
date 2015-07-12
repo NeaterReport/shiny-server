@@ -4,7 +4,7 @@ fluidPage(theme = shinytheme("united"),
           includeCSS("www/styles.css"),
           useShinyjs(), # for field reset
   
-  titlePanel(h2("Quandrant Analysis - Beta", align = "centre")),
+  titlePanel(title = h2("Quadrant Analysis - Beta", align = "centre")),
   
   sidebarLayout(
     
@@ -53,15 +53,15 @@ fluidPage(theme = shinytheme("united"),
           fluidPage(
             fluidRow(
               br(),
-              box(title = "What is a Quandrant Plot?", width = 4,
+              box(title = "What is a Quadrant Plot?", width = 4,
                 p("Conduct quadrant analysis with your data or a randomly 
-generated dataset. Quandrant analysis is commonly used in market research to identify priority areas using two criteria, one measuring importance and another capturing performance."),
+generated dataset. Quadrant analysis is commonly used in market research to identify priority areas using two criteria, one measuring importance and another capturing performance."),
                 p("In this example, importance is measured by the strength of the correlation coefficients and performance by the mean scores. The cut-off is set as the median correlation and mean scores. In actual applications, different criteria and cut-off can be used to slice the data."),
                 p( HTML('<i class="fa fa-info-circle"></i>'),"The plot is interactive. Click on a point and it will show an histogram of the variable and its correlation with the last variable in the data (assumed to be the outcome). Double clicking on the graph allow you to dynamically set the cut-off points.")
                 ),
               box(width = 8,
                   br(),
-                plotOutput("plot_quandrant",
+                plotOutput("plot_quadrant",
                            click = "plot_click",
                            hover = "plot_hover",
                            dblclick = "plot_dblclick"),br(),
