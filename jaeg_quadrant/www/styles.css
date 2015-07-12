@@ -1,0 +1,61 @@
+body {
+    background-color: #FFF2F3;
+}
+
+h2 {
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 700;
+  color: #FF743D;
+}
+
+.control-label {
+  color: #409ADF;
+}
+
+.well {
+  background-color: #FEFBFB;
+}
+
+/* Style dataTable */
+
+table.dataTable tbody tr {
+    background-color: #FFF2F3;
+}
+
+table.dataTable.stripe tbody tr.odd, table.dataTable.display tbody tr.odd {
+    background-color: #DBF7E1;
+}
+
+table.dataTable.stripe tbody tr.odd.selected, table.dataTable.display tbody tr.odd.selected {
+    background-color: #EDEBA9;
+}
+
+table.dataTable.stripe tbody tr.odd.selected, table.dataTable.display tbody tr.even.selected {
+    background-color: #EDEBA9;
+}
+
+div.DTFC_Blocker {background-color: #FFF2F3;}
+  
+table.DTFC_Cloned thead,table.DTFC_Cloned tfoot{background-color: #FFF2F3;}
+
+/* TabPanel style */
+/* This colour the tab */
+
+.nav>li>a{
+  background-color: #DBF7E1;
+}
+
+/* This colour the hover tab */
+.nav>li>a:hover, .nav>li>a:focus {
+    text-decoration: none;
+    background-color: yellow;
+}
+
+/* This color the active tab */
+.nav-tabs>li.active>a, .nav-tabs>li.active>a:hover, .nav-tabs>li.active>a:focus {
+    color: #555;
+    cursor: default;
+    background-color: yellow;
+    border: 1px solid #ddd;
+    border-bottom-color: transparent
+}
