@@ -84,8 +84,8 @@ dashboardPage(skin="purple",
                   ),
                   column(4,
                          p(strong("Accessorize Me!")),
-                         jscolorInput("colourid", label = "Colour me!"),
-                         uiOutput('mycolour'),
+                         # jscolorInput("colourid", label = "Colour me!"),
+                         # uiOutput('mycolour'),
                          checkboxInput("label", label = "Label me!", value=FALSE),
                          checkboxInput("order", label = "Order me!", value=FALSE),
                          checkboxInput("seedata", label = "Show me your data!", value=FALSE)
@@ -104,7 +104,7 @@ dashboardPage(skin="purple",
                                  )
                 )
                 )
-              ), sortableR("sortable") 
+              ) #, sortableR("sortable") 
             ), # tabPanel "Single Group"
             
             tabPanel("Multiple Group",

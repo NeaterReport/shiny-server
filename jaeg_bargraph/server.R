@@ -49,10 +49,10 @@ function(input, output) {
     # Add a progress message
     withProgress({
       setProgress(message = "Making a Plot")
-    mycolour <- ifelse(is.null(input$colourid), "ffffff", input$colourid) # assign user picked colour
+    # mycolour <- ifelse(is.null(input$colourid), "ffffff", input$colourid) # assign user picked colour
     gg <- ggplot(head(datasetInput(), 10), 
                  aes_string(x = input$var, y = "count")) + 
-      geom_bar(stat="identity", fill = mycolour) +
+      geom_bar(stat="identity", fill = "#7099a5") +
       ylab("Count") + xlab(input$var)
     
     # Customize the label and orientation depending on the type of var

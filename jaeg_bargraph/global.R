@@ -16,11 +16,11 @@ library(dplyr) # load dplyr last
 library(readr)
 library(markdown)
 library(rmarkdown)
-library(RLumShiny) # for the colour picker
+# library(RLumShiny) # for the colour picker
 library(scales)
 library(shiny)
 library(shinydashboard)
-library(sortableR)
+# library(sortableR)
 
 # ---- Load Data ----
 
