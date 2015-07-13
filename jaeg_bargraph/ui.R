@@ -1,10 +1,21 @@
-# ui for JAEG Bar Graph
+# ui for JAEG Bar Graph 2
+
+# ---- Need More Emelie Solution! JAEG ----
+# Issue:
+# 1 - Ran out of colour palette for some themes for the multiple bar graphs
+
+# ---- Load some packages here ---
+
+library(shinydashboard)
+library(shinyjs)
+library(rmarkdown)
 
 dashboardPage(skin="purple",
-
-# ---- Dashboard Header ----              
-  dashboardHeader(title = "JAEG Bar Graph",
-                  
+  
+# ---- Dashboard Header ----
+  dashboardHeader(
+    title = "JAEG Bar Graph",
+    
     # Greetings :)
     dropdownMenu(type = "messages",
                  messageItem(
@@ -13,15 +24,12 @@ dashboardPage(skin="purple",
                    icon = icon("smile-o"),
                    time = Sys.Date()
                  )
-                )
-    ), # dashboardHeader
-
-# ---- Dashboard Side Bar ----         
+    )
+    
+  ), # dashboardHeader
+ 
+# ---- Dashboard Sidebar ----
   dashboardSidebar(
-
-    # Customize title
-    h4(textInput("caption", "Name Your App", "My Awesome JAEG Bar Graph!"), align="center"),
-                
     sidebarMenu(
       menuItem("Bar Graph", tabName = "bargraph", icon = icon("bar-chart")),
       menuItem("", tabName = "aboutus", icon = icon("info"), 
@@ -31,7 +39,7 @@ dashboardPage(skin="purple",
       menuItem("Ben",
                href = "https://ca.linkedin.com/in/beneditochou", icon = icon("linkedin"))
     ),
-                
+    
     # Add selector for graph style from ggthemes
     selectInput("graphstyle", label = "Roll your style!",
                 choices = c("Classic" = 1,
@@ -46,16 +54,13 @@ dashboardPage(skin="purple",
     
     # Gotta have @('_')@!
     p(img(src="SnowMonkey.jpg", width="100%"))
-
-    ), # dashboardSidebar
+    
+  ), # dashboardSidebar
 
 # ---- Dashboard Body ----
   dashboardBody(
+    useShinyjs(), # call Shinyjs
     
-    # Show the custom title
-    h2(textOutput("caption", container = span),
-      style = "color: #4d3a7d;"),
-                
     tabItems(
       tabItem(tabName = "bargraph",
         fluidPage(
@@ -74,70 +79,70 @@ dashboardPage(skin="purple",
                                 selected = "Year")
                   ),
                   column(4,
-                    selectInput("state", label = "Choose a state",
-                                choices = c("Found",
-                                            "Matched",
-                                            "Lost",
-                                            "Unknown"),
-                                selected = "Found"
-                    )
+                         selectInput("state", label = "Choose a state",
+                                     choices = c("Found",
+                                                 "Matched",
+                                                 "Lost",
+                                                 "Unknown"),
+                                     selected = "Found"
+                         )
                   ),
                   column(4,
                          p(strong("Accessorize Me!")),
-                         # jscolorInput("colourid", label = "Colour me!"),
-                         # uiOutput('mycolour'),
+                         div(class = "output", "Colour me!"),
+                         colourInput("colour", NULL, "grey60"), # colour selector from shinyjs!
                          checkboxInput("label", label = "Label me!", value=FALSE),
                          checkboxInput("order", label = "Order me!", value=FALSE),
                          checkboxInput("seedata", label = "Show me your data!", value=FALSE)
                   )
                 ) # wellPanel
               ),
-              fluidRow(id = "sortable",
-                box(title = "Top 10 Lost and Found", width = 12,
-                    solidHeader = TRUE, status = "warning", collapsible = TRUE,
-                    plotOutput("plot_sg"), height="auto"),
-                box(title = "Data Table", width = 12, 
-                    solidHeader = TRUE, status = "primary", collapsible = TRUE,
-                    conditionalPanel(condition = "input.seedata == true",
-                                 wellPanel(
-                                   DT::dataTableOutput("selectdata")
-                                 )
-                )
-                )
-              ) #, sortableR("sortable") 
+              fluidRow(
+                       box(title = "Top 10 Lost and Found", width = 12,
+                           solidHeader = TRUE, status = "warning", collapsible = TRUE,
+                           plotOutput("plot_sg"), height="auto"),
+                       box(title = "Data Table", width = 12, 
+                           solidHeader = TRUE, status = "primary", collapsible = TRUE,
+                           conditionalPanel(condition = "input.seedata == true",
+                                            wellPanel(
+                                              DT::dataTableOutput("selectdata")
+                                            )
+                           )
+                       )
+              )
             ), # tabPanel "Single Group"
             
             tabPanel("Multiple Group",
               wellPanel(
                 fluidRow(
                   column(width=6,
-                      selectInput("varx", label = "Choose a first group",
+                         selectInput("varx", label = "Choose a first group",
                                      choices = c("Sex",
                                                  "Year",
                                                  "Month",
                                                  "Weekday" = "Wday"),
                                      selected = "Wday"),
-                      selectInput("varfill", label = "Choose a second group",
+                         selectInput("varfill", label = "Choose a second group",
                                      choices = c("Sex",
                                                  "Year",
                                                  "Month",
                                                  "Weekday" = "Wday"),
                                      selected = "Sex")
-                      ),
+                  ),
                   column(width=6,
-                      selectizeInput("type", label = "Choose a type",
-                                     choices = c("Dodge" = "dodge",
-                                                 "Stack" = "stack",
-                                                 "Stack Fill" = "fill"),
-                                     selected = "dodge"),
-                      selectizeInput("varfacet", label = "Choose a facet",
-                                     choices = c("",
-                                                 "Sex",
-                                                 "Year",
-                                                 "Month",
-                                                 "Weekday" = "Wday"),
-                                     selected = NULL)
-                      )
+                         selectizeInput("type", label = "Choose a type",
+                                        choices = c("Dodge" = "dodge",
+                                                    "Stack" = "stack",
+                                                    "Stack Fill" = "fill"),
+                                        selected = "dodge"),
+                         selectizeInput("varfacet", label = "Choose a facet",
+                                        choices = c("",
+                                                    "Sex",
+                                                    "Year",
+                                                    "Month",
+                                                    "Weekday" = "Wday"),
+                                        selected = NULL)
+                  )
                 ) 
               ), # wellPanel
               fluidRow(
@@ -149,11 +154,11 @@ dashboardPage(skin="purple",
       ), # tabItem "bargraph"
       
       tabItem(tabName = "aboutus",
-        fluidPage(
-          column(width = 5,
-                 includeMarkdown("www/aboutus.md")
-          )
-        )
+              fluidPage(
+                column(width = 5,
+                       includeMarkdown("www/aboutus.md")
+                )
+              )
       ) # tabItem "aboutus"
     ) # tabItems
   ) # dashboardBody

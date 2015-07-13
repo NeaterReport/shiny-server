@@ -1,8 +1,8 @@
 name: jaeg_bargraph
 account: orange
 server: shinyapps.io
-bundleId: 217710
+bundleId: 218830
 url: https://orange.shinyapps.io/jaeg_bargraph
-when: 1436500320.80208
+when: 1436769218.32676
 asMultiple: FALSE
 asStatic: FALSE
