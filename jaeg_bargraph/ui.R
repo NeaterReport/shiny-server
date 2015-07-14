@@ -80,11 +80,10 @@ dashboardPage(skin="purple",
                   ),
                   column(4,
                          selectInput("state", label = "Choose a state",
-                                     choices = c("Found",
-                                                 "Matched",
+                                     choices = c("Matched",
                                                  "Lost",
                                                  "Unknown"),
-                                     selected = "Found"
+                                     selected = "Matched"
                          )
                   ),
                   column(4,
@@ -110,45 +109,45 @@ dashboardPage(skin="purple",
                            )
                        )
               )
-            ), # tabPanel "Single Group"
+            ) # tabPanel "Single Group"
             
-            tabPanel("Multiple Group",
-              wellPanel(
-                fluidRow(
-                  column(width=6,
-                         selectInput("varx", label = "Choose a first group",
-                                     choices = c("Sex",
-                                                 "Year",
-                                                 "Month",
-                                                 "Weekday" = "Wday"),
-                                     selected = "Wday"),
-                         selectInput("varfill", label = "Choose a second group",
-                                     choices = c("Sex",
-                                                 "Year",
-                                                 "Month",
-                                                 "Weekday" = "Wday"),
-                                     selected = "Sex")
-                  ),
-                  column(width=6,
-                         selectizeInput("type", label = "Choose a type",
-                                        choices = c("Dodge" = "dodge",
-                                                    "Stack" = "stack",
-                                                    "Stack Fill" = "fill"),
-                                        selected = "dodge"),
-                         selectizeInput("varfacet", label = "Choose a facet",
-                                        choices = c("",
-                                                    "Sex",
-                                                    "Year",
-                                                    "Month",
-                                                    "Weekday" = "Wday"),
-                                        selected = NULL)
-                  )
-                ) 
-              ), # wellPanel
-              fluidRow(
-                plotOutput("plot_mg", height = "auto")
-              )
-            ) # tabPanel "Multiple Group"
+#             tabPanel("Multiple Group",
+#               wellPanel(
+#                 fluidRow(
+#                   column(width=6,
+#                          selectInput("varx", label = "Choose a first group",
+#                                      choices = c("Sex",
+#                                                  "Year",
+#                                                  "Month",
+#                                                  "Weekday" = "Wday"),
+#                                      selected = "Wday"),
+#                          selectInput("varfill", label = "Choose a second group",
+#                                      choices = c("Sex",
+#                                                  "Year",
+#                                                  "Month",
+#                                                  "Weekday" = "Wday"),
+#                                      selected = "Sex")
+#                   ),
+#                   column(width=6,
+#                          selectizeInput("type", label = "Choose a type",
+#                                         choices = c("Dodge" = "dodge",
+#                                                     "Stack" = "stack",
+#                                                     "Stack Fill" = "fill"),
+#                                         selected = "dodge"),
+#                          selectizeInput("varfacet", label = "Choose a facet",
+#                                         choices = c("",
+#                                                     "Sex",
+#                                                     "Year",
+#                                                     "Month",
+#                                                     "Weekday" = "Wday"),
+#                                         selected = NULL)
+#                   )
+#                 ) 
+#               ), # wellPanel
+#               fluidRow(
+#                 plotOutput("plot_mg", height = "auto")
+#               )
+#             ) # tabPanel "Multiple Group"
           ) # tabsetPanel 
         ) # fluidpage
       ), # tabItem "bargraph"
