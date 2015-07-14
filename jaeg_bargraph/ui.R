@@ -11,7 +11,8 @@ library(shiny)
 # library(shinyjs) lets not use any js for now
 library(rmarkdown)
 
-dashboardPage(skin="purple",
+dashboardPage(
+  # skin="purple",
   
 # ---- Dashboard Header ----
   dashboardHeader(

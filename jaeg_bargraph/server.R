@@ -16,7 +16,7 @@ library(rmarkdown)
 # ---- Import data ----
 
 # Import the cleaned lost and found animals data from the City of Vancouver
-lostAnimal <- read_csv("www/lostAnimals.csv")
+# lostAnimal <- read_csv("www/LostAnimals.csv")
 
 # Create a reduced subset for 2011 to 2014 (only run once)
 # lostAnimal <- read_csv("www/VancouverLostAnimals.csv")
@@ -37,78 +37,78 @@ function(input, output) {
 # ---- Aggreate and filter data ----
   
  # Summarize the data by the selected variable and state
-  datasetInput <- reactive({
-    # Add a progress message
-    withProgress({
-      setProgress(message = "Processing data")
-      
-      # Use plyr instead of dplyr because it is easier to work with string input
-      subdata <- plyr::ddply(lostAnimal, c("State", input$var), plyr::summarise, count=length(State) ,.drop=FALSE) # call the plyr summarize fn using ::
-      subdata <- subdata %>% filter(State == input$state) %>%
-        mutate(rank = rank(-count)) %>%
-        arrange(desc(count))
-      if(input$var == "Name") {
-        subdata <- filter(subdata, Name!="No Name") # exclude animals with no name
-      } else {
-        subdata
-      }
-      
-      # Reorder by factor
-      subdata[, input$var] <- factor(subdata[, input$var])
-      if (input$order==TRUE) {
-        subdata[,input$var] <- reorder(subdata[,input$var], subdata[,"count"]) # reorder by count
-      }
-      return(subdata)
-    })
-  })
-  
-# -----  Create data table -----
-  
-  # Only show the top 10
-#   output$selectdata <- DT::renderDataTable(head(datasetInput(), 10), 
-#                                        options = list(searching = FALSE, paging = FALSE))
-  
-# -----  Make bar graph in ggplot2 -----
-  
-  output$plot_sg <- renderPlot({
-    
-    # Add a progress message
-    withProgress({
-      setProgress(message = "Making a Plot")
-      
-#       mycolour <- ifelse(is.null(input$colour), "grey60", input$colour)# assign user picked co
-
-      gg <- ggplot(head(datasetInput(), 10), 
-                   aes_string(x = input$var, y = "count")) + 
-        geom_bar(stat="identity", fill = "grey60") +
-        ylab("Count") + xlab(input$var)
-      
-      # Customize the label and orientation depending on the type of var
-      if(input$var %in% c("Year", "Month", "Day", "Wday") & input$label == TRUE) {
-        gg <- gg +
-          geom_text(aes(label = comma(count)), color = "darkgrey", vjust = -0.1)
-      } else if(input$var %in% c("Name","Color","Breed") & input$label == TRUE) {
-        gg <- gg + 
-          geom_text(aes(label = comma(count)), color = "white", hjust = 1.2) +
-          coord_flip()
-      } else if (input$var %in% c("Name","Color","Breed") & input$label == FALSE) {
-        gg <- gg + coord_flip()
-      }
-      
-      # Branch to choose graph style
-      if(input$graphstyle == 1) {gg + theme_classic()}
-      else if (input$graphstyle == 2) {gg + theme_economist() + scale_fill_economist()}
-      else if (input$graphstyle == 3) {gg + theme_excel() + scale_fill_excel()}
-      else if (input$graphstyle == 4) {gg + theme_few() + scale_fill_few()}
-      else if (input$graphstyle == 5) {gg + theme_fivethirtyeight() + 
-          scale_fill_fivethirtyeight()}        
-      else if (input$graphstyle == 6) {gg + theme_stata() + scale_fill_stata()}
-      else if (input$graphstyle == 7) {gg + theme_fivethirtyeight() + 
-          scale_fill_tableau("colorblind10")}
-      else if (input$graphstyle == 8) {gg + theme_tufte()}
-      
-    })
-  })
+#   datasetInput <- reactive({
+#     # Add a progress message
+#     withProgress({
+#       setProgress(message = "Processing data")
+#       
+#       # Use plyr instead of dplyr because it is easier to work with string input
+#       subdata <- plyr::ddply(lostAnimal, c("State", input$var), plyr::summarise, count=length(State) ,.drop=FALSE) # call the plyr summarize fn using ::
+#       subdata <- subdata %>% filter(State == input$state) %>%
+#         mutate(rank = rank(-count)) %>%
+#         arrange(desc(count))
+#       if(input$var == "Name") {
+#         subdata <- filter(subdata, Name!="No Name") # exclude animals with no name
+#       } else {
+#         subdata
+#       }
+#       
+#       # Reorder by factor
+#       subdata[, input$var] <- factor(subdata[, input$var])
+#       if (input$order==TRUE) {
+#         subdata[,input$var] <- reorder(subdata[,input$var], subdata[,"count"]) # reorder by count
+#       }
+#       return(subdata)
+#     })
+#   })
+#   
+# # -----  Create data table -----
+#   
+#   # Only show the top 10
+# #   output$selectdata <- DT::renderDataTable(head(datasetInput(), 10), 
+# #                                        options = list(searching = FALSE, paging = FALSE))
+#   
+# # -----  Make bar graph in ggplot2 -----
+#   
+#   output$plot_sg <- renderPlot({
+#     
+#     # Add a progress message
+#     withProgress({
+#       setProgress(message = "Making a Plot")
+#       
+# #       mycolour <- ifelse(is.null(input$colour), "grey60", input$colour)# assign user picked co
+# 
+#       gg <- ggplot(head(datasetInput(), 10), 
+#                    aes_string(x = input$var, y = "count")) + 
+#         geom_bar(stat="identity", fill = "grey60") +
+#         ylab("Count") + xlab(input$var)
+#       
+#       # Customize the label and orientation depending on the type of var
+#       if(input$var %in% c("Year", "Month", "Day", "Wday") & input$label == TRUE) {
+#         gg <- gg +
+#           geom_text(aes(label = comma(count)), color = "darkgrey", vjust = -0.1)
+#       } else if(input$var %in% c("Name","Color","Breed") & input$label == TRUE) {
+#         gg <- gg + 
+#           geom_text(aes(label = comma(count)), color = "white", hjust = 1.2) +
+#           coord_flip()
+#       } else if (input$var %in% c("Name","Color","Breed") & input$label == FALSE) {
+#         gg <- gg + coord_flip()
+#       }
+#       
+#       # Branch to choose graph style
+#       if(input$graphstyle == 1) {gg + theme_classic()}
+#       else if (input$graphstyle == 2) {gg + theme_economist() + scale_fill_economist()}
+#       else if (input$graphstyle == 3) {gg + theme_excel() + scale_fill_excel()}
+#       else if (input$graphstyle == 4) {gg + theme_few() + scale_fill_few()}
+#       else if (input$graphstyle == 5) {gg + theme_fivethirtyeight() + 
+#           scale_fill_fivethirtyeight()}        
+#       else if (input$graphstyle == 6) {gg + theme_stata() + scale_fill_stata()}
+#       else if (input$graphstyle == 7) {gg + theme_fivethirtyeight() + 
+#           scale_fill_tableau("colorblind10")}
+#       else if (input$graphstyle == 8) {gg + theme_tufte()}
+#       
+#     })
+#   })
   
 #   #----  Make multi-group bar graph in ggplot2 ----
 #   
