@@ -79,11 +79,11 @@ function(input, output) {
     withProgress({
       setProgress(message = "Making a Plot")
       
-#       mycolour <- ifelse(is.null(input$colour), "grey60", input$colour)# assign user picked co
+      mycolour <- ifelse(is.null(input$colour), "grey60", input$colour)# assign user picked co
 
       gg <- ggplot(head(datasetInput(), 10), 
                    aes_string(x = input$var, y = "count")) + 
-        geom_bar(stat="identity", fill = "grey60") +
+        geom_bar(stat="identity", fill = mycolour) +
         ylab("Count") + xlab(input$var)
       
       # Customize the label and orientation depending on the type of var
