@@ -7,7 +7,7 @@
 # ---- Load some packages here ---
 
 library(shinydashboard)
-library(shinyjs)
+# library(shinyjs) lets not use any js for now
 library(rmarkdown)
 
 dashboardPage(skin="purple",
@@ -59,7 +59,7 @@ dashboardPage(skin="purple",
 
 # ---- Dashboard Body ----
   dashboardBody(
-    useShinyjs(), # call Shinyjs
+    # useShinyjs(), # call Shinyjs
     
     tabItems(
       tabItem(tabName = "bargraph",
@@ -89,8 +89,8 @@ dashboardPage(skin="purple",
                   ),
                   column(4,
                          p(strong("Accessorize Me!")),
-                         div(class = "output", "Colour me!"),
-                         colourInput("colour", NULL, "grey60"), # colour selector from shinyjs!
+#                          div(class = "output", "Colour me!"),
+#                          colourInput("colour", NULL, "grey60"), # colour selector from shinyjs!
                          checkboxInput("label", label = "Label me!", value=FALSE),
                          checkboxInput("order", label = "Order me!", value=FALSE),
                          checkboxInput("seedata", label = "Show me your data!", value=FALSE)
