@@ -93,23 +93,23 @@ dashboardPage(
                          div(class = "output", "Colour me!"),
                          colourInput("colour", NULL, "grey60"), # colour selector from shinyjs!
                          checkboxInput("label", label = "Label me!", value=FALSE),
-                         checkboxInput("order", label = "Order me!", value=FALSE)
-                         # checkboxInput("seedata", label = "Show me your data!", value=FALSE)
+                         checkboxInput("order", label = "Order me!", value=FALSE),
+                         checkboxInput("seedata", label = "Show me your data!", value=FALSE)
                   )
                 ) # wellPanel
               ),
               fluidRow(
                        box(title = "Top 10 Lost and Found", width = 12,
                            solidHeader = TRUE, status = "warning", collapsible = TRUE,
-                           plotOutput("plot_sg"), height="auto")
-#                        box(title = "Data Table", width = 12, 
-#                            solidHeader = TRUE, status = "primary", collapsible = TRUE,
-#                            conditionalPanel(condition = "input.seedata == true",
-#                                             wellPanel(
-#                                               DT::dataTableOutput("selectdata")
-#                                             )
-#                            )
-#                        )
+                           plotOutput("plot_sg"), height="auto"),
+                       box(title = "Data Table", width = 12, 
+                           solidHeader = TRUE, status = "primary", collapsible = TRUE,
+                           conditionalPanel(condition = "input.seedata == true",
+                                            wellPanel(
+                                              DT::dataTableOutput("selectdata")
+                                            )
+                           )
+                       )
               )
             ), # tabPanel "Single Group"
             

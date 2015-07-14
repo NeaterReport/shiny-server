@@ -68,8 +68,8 @@ function(input, output) {
 # -----  Create data table -----
   
   # Only show the top 10
-#   output$selectdata <- DT::renderDataTable(head(datasetInput(), 10), 
-#                                        options = list(searching = FALSE, paging = FALSE))
+  output$selectdata <- DT::renderDataTable(head(datasetInput(), 10), 
+                                       options = list(searching = FALSE, paging = FALSE))
   
 # -----  Make bar graph in ggplot2 -----
   
