@@ -16,23 +16,23 @@ library(rmarkdown)
 # ---- Import data ----
 
 # Import the cleaned lost and found animals data from the City of Vancouver
-# lostAnimal <- read_csv("www/LostAnimals.csv")
-# 
-# lostAnimal <- lostAnimal %>% mutate(Year = factor(Year),
-#                                     Month = factor(Month))
+lostAnimal <- read_csv("www/LostAnimals.csv")
+ 
+lostAnimal <- lostAnimal %>% mutate(Year = factor(Year),
+                                     Month = factor(Month))
 
 # Create a reduced subset for 2011 to 2014 (only run once)
-lostAnimal <- read_csv("www/VancouverLostAnimals.csv")
-
+# lostAnimal <- read_csv("www/VancouverLostAnimals.csv")
+# 
 # Create date variables
-lostAnimal <- lostAnimal %>% 
-              mutate(Year = factor(year(Date)),
-                                    Month = factor(month(Date)),
-                                    Day = day(Date),
-                                    Wday = wday(Date, label=TRUE))
-
+# lostAnimal <- lostAnimal %>% 
+#               mutate(Year = factor(year(Date)),
+#                                     Month = factor(month(Date)),
+#                                     Day = day(Date),
+#                                     Wday = wday(Date, label=TRUE))
+# 
 # filter(Date >=  as.Date("2011-01-01"), Date < as.Date("2015-01-01")) %>%
-
+# 
 # write.csv(lostAnimal, "www/LostAnimals.csv")
 
 function(input, output) {
@@ -68,7 +68,6 @@ function(input, output) {
 # -----  Create data table -----
   
   # Only show the top 10
-  # The DT namespace seems to get rid of the error
   output$selectdata <- DT::renderDataTable(head(datasetInput(), 10), 
                                        options = list(searching = FALSE, paging = FALSE))
   
