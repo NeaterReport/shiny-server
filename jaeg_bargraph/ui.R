@@ -11,8 +11,7 @@ library(shiny)
 library(shinyjs)
 library(rmarkdown)
 
-dashboardPage(
-  # skin="purple",
+dashboardPage(skin="purple",
   
 # ---- Dashboard Header ----
   dashboardHeader(
@@ -82,10 +81,11 @@ dashboardPage(
                   ),
                   column(4,
                          selectInput("state", label = "Choose a state",
-                                     choices = c("Matched",
+                                     choices = c("Found",
+                                                 "Matched",
                                                  "Lost",
                                                  "Unknown"),
-                                     selected = "Matched"
+                                     selected = "Found"
                          )
                   ),
                   column(4,
