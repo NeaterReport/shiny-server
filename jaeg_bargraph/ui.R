@@ -85,7 +85,7 @@ dashboardPage(skin="purple",
                                                  "Matched",
                                                  "Lost",
                                                  "Unknown"),
-                                     selected = "Found"
+                                     selected = "Matched"
                          )
                   ),
                   column(4,
