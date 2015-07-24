@@ -29,7 +29,7 @@ library(rgeos) # Suppose to be a free alternative for gpclib
 library(raster) 
 
 # Import data
-waitTime_prov_df <- read_excel("CIHI treatment wait time.xlsx", "To R Prov")
+waitTime_prov_df <- read_excel("www/CIHI treatment wait time.xlsx", "To R Prov")
 # Add a dummy indicator
 waitTime_prov_df$MetB <- ifelse(waitTime_prov_df$MetBenchmark > 90, "Met", "Not Met")
 # reorder from west to east using factor
@@ -179,7 +179,7 @@ plot_data <- subdata_prov_df
       labs(title = "% Met Brenchmark",
            fill = "") +  guides(fill = guide_legend(reverse = TRUE)) +
       theme(strip.background = element_rect(fill = "white"),
-            strip.text = element_text(size = rel(1.5), colour = "grey70"),
+            strip.text = element_text(size = rel(1.2), colour = "grey70"),
             plot.margin = unit(c(1,1,1,1),"cm"),
             plot.title=element_text(size = 18, vjust=3, colour = "#2CA02C"))
    

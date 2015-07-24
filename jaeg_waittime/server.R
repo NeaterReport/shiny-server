@@ -410,7 +410,7 @@ function(input, output, session) {
   
   output$downloadReport <- downloadHandler(
     filename = function() {
-      paste('my-report', sep = '.', switch(
+      paste(paste0('my-report-',gsub("\\.","",input$ui_prov)), sep = '.', switch(
         input$format, PDF = 'pdf', HTML = 'html', Word = 'docx'
       ))
     },
@@ -424,7 +424,7 @@ function(input, output, session) {
        owd <- setwd(tempdir())
        on.exit(setwd(owd))
        file.copy(src, 'sampleReport.Rmd')
-       file.copy(src, './www/CIHI treatment wait time.xlsx')
+       # file.copy(src, './www/CIHI treatment wait time.xlsx')
       
       library(rmarkdown)
       out <- render(src, switch(

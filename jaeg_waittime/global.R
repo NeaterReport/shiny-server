@@ -3,7 +3,6 @@
 # ---- Need More Emelie Solution! JAEG ----
 # To-do:
 # 1 - Add the northern territory back on the map
-# 2 - Add dynamic file naming
 
 # Issue:
 # 1 - Report Format need a lot of work!
