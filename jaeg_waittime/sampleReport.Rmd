@@ -29,7 +29,7 @@ library(rgeos) # Suppose to be a free alternative for gpclib
 library(raster) 
 
 # Import data
-waitTime_prov_df <- read_excel("./www/CIHI treatment wait time.xlsx", "To R Prov")
+waitTime_prov_df <- read_excel("CIHI treatment wait time.xlsx", "To R Prov")
 # Add a dummy indicator
 waitTime_prov_df$MetB <- ifelse(waitTime_prov_df$MetBenchmark > 90, "Met", "Not Met")
 # reorder from west to east using factor
