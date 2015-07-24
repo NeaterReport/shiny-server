@@ -61,7 +61,8 @@ dashboardPage(skin = "purple",
               ),
               column(width = 2,
                 selectInput("ui_prov", "Select a Province",
-                            choices = unique(waitTime_prov_df$Province)[-11], # Exclude Canada here
+                            choices = c("B.C.", "Alta.", "Sask.", "Man.", 
+                                        "Ont.", "Que.", "N.B.", "P.E.I.", "N.S.", "N.L."),
                             selected = "B.C.")
               ),
               column(width = 2,
