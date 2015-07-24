@@ -421,10 +421,10 @@ function(input, output, session) {
       # not sure what this add, as it adds complexity to reading in the data
       # temporarily switch to the temp dir, in case you do not have write
       # permission to the current working directory
-#       owd <- setwd(tempdir())
-#       on.exit(setwd(owd))
-#       file.copy(src, 'report2.Rmd')
-#       file.copy(src, 'CIHI treatment wait time.xlsx')
+       owd <- setwd(tempdir())
+       on.exit(setwd(owd))
+       file.copy(src, 'sampleReport.Rmd')
+       file.copy(src, './www/CIHI treatment wait time.xlsx')
       
       library(rmarkdown)
       out <- render(src, switch(
