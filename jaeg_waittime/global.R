@@ -27,10 +27,10 @@ library(ggmap)
 library(gpclib) # This has restrictive license, but maybe needed for foritfy if there is no rgeos
 library(maps)
 library(maptools) # read shapefiles
-library(rgdal) # read shapefiles
+#library(rgdal) # read shapefiles
 library(raster) 
-library(rgeos) # Suppose to be a free alternative for gpclib
-library(sp)
+#library(rgeos) # Suppose to be a free alternative for gpclib
+#library(sp)
 
 # How to add fancy header and footer on markdown for pdf
 # see http://stackoverflow.com/questions/25329375/creating-a-footer-for-every-page-using-r-markdown
