@@ -1,5 +1,6 @@
 # server for JAEG Wait Time
 
+
 function(input, output, session) {
   
 # ---- Get Name of Treatment and Province ----
