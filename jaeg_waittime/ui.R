@@ -22,16 +22,16 @@ dashboardPage(skin = "purple",
       menuItem("National", tabName = "national",
                icon = icon("cube"), badgeLabel = "New", badgeColor = "teal"),
       menuItem("", tabName = "aboutus",
-               icon = icon("info"), badgeLabel = "Gotta luv @('_')@!", badgeColor = "orange"),
+               icon = icon("info"), badgeLabel = "About the App", badgeColor = "orange"),
       menuItem("Emelie", href = "https://ca.linkedin.com/pub/emelie-gustafsson/58/930/647", icon = icon("linkedin")),
       menuItem("Ben", href = "https://ca.linkedin.com/in/beneditochou", icon = icon("linkedin")),
       br(),
       radioButtons('format', 'Download your customized report', c('PDF', 'HTML', 'Word'),
                    inline = TRUE),
-      downloadButton('downloadReport', class = "dlButton"),
-      br(),br(),
-      # Gotta have @('_')@!
-      p(img(src = "SnowMonkey.jpg", width="100%"))
+      downloadButton('downloadReport', class = "dlButton")
+#       br(),br(),
+#       Gotta have @('_')@!
+#       p(img(src = "SnowMonkey.jpg", width="100%"))
     )    
   ), # dashboardSidebar
 
