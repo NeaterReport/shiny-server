@@ -1,6 +1,7 @@
-## Neater Report
+## [Neater Report](http://www.neaterreport.com)
 
 **Cleaner. Cooler. Complex Report Made Simple.**
+
 
 #### About the App
 
