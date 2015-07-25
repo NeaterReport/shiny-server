@@ -28,10 +28,10 @@ dashboardPage(skin = "purple",
       br(),
       radioButtons('format', 'Download your customized report', c('PDF', 'HTML', 'Word'),
                    inline = TRUE),
-      downloadButton('downloadReport', class = "dlButton"),
-      br(),br(),
-      # Gotta have @('_')@!
-      p(img(src = "SnowMonkey.jpg", width="100%"))
+      downloadButton('downloadReport', class = "dlButton")
+#       br(),br(),
+#       Gotta have @('_')@!
+#       p(img(src = "SnowMonkey.jpg", width="100%"))
     )    
   ), # dashboardSidebar
 
