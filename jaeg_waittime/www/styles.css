@@ -1,0 +1,83 @@
+
+/* Style the download button */
+.shiny-download-link, .dlButton {
+  display: block;
+  color: Black;
+  background-color: Aqua;
+  width: 100px;
+  margin: 0 auto 0 auto;
+  text-align: center;
+  opacity: 1;
+}
+
+#downloadReport {
+  color: Black;
+}
+
+/* Change icon colour */
+.fa-linkedin, .fa-th-large {
+  color: Pink;
+  margin: auto;
+}
+
+.fa-download{
+  color: Black;
+  margin: auto;
+}
+
+.fa-download:hover{
+  color: Orange;
+}
+
+.fa-flag {
+  color: Red;
+}
+
+/* Align the image on the same line */
+#image_flag {
+  display: inline;
+  padding: 5px;
+}
+
+/* Make the infoBox smaller */
+.info-box {
+    display: block;
+    min-height: 60px;
+    background: #fff;
+    width: 100%;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+    border-radius: 2px;
+    margin-bottom: 15px
+}
+
+.info-box-icon {
+    border-radius: 1px 0 0 1px;
+    display: block;
+    float: left;
+    height: 60px;
+    width: 60px;
+    text-align: center;
+    font-size: 60px;
+    line-height: 60px;
+    background: rgba(0, 0, 0, .2)
+}
+
+.info-box-content {
+    padding: 5px 5px;
+    margin-left: 60px
+}
+
+.info-box-number {
+    display: block;
+    font-weight: 600;
+    font-size: 15px
+}
+
+.info-box-text, .progress-description {
+    display: block;
+    font-size: 11px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis
+}
+
