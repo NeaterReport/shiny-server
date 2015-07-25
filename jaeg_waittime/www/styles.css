@@ -15,9 +15,13 @@
 }
 
 /* Change icon colour */
-.fa-linkedin, .fa-th-large {
+.fa-th-large {
   color: Pink;
   margin: auto;
+}
+
+.fa-linkedin {
+  color: #8fd6bd;
 }
 
 .fa-download{

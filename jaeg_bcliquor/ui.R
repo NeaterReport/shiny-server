@@ -1,6 +1,6 @@
 # ui for JAEG BC Liquor
 
-dashboardPage(
+dashboardPage(skin = "purple",
 
 # ---- Dashboard Header ----
   dashboardHeader(title = "Wine and Beer",
@@ -26,12 +26,12 @@ dashboardPage(
       menuItem("Liqour Explorer", tabName = "explorer",
                icon = icon("cube"), badgeLabel = "New", badgeColor = "teal"),
       menuItem("", tabName = "aboutus",
-               icon = icon("info"), badgeLabel = "Gotta luv @('_')@!", badgeColor = "orange"),
+               icon = icon("info"), badgeLabel = "About the App", badgeColor = "orange"),
       menuItem("Emelie", href = "https://ca.linkedin.com/pub/emelie-gustafsson/58/930/647", icon = icon("linkedin")),
-      menuItem("Ben", href = "https://ca.linkedin.com/in/beneditochou", icon = icon("linkedin")),
-      br(),
-      # Gotta have @('_')@!
-      p(img(src="SnowMonkey.jpg", width="100%"))
+      menuItem("Ben", href = "https://ca.linkedin.com/in/beneditochou", icon = icon("linkedin"))
+#       br(),
+#       Gotta have @('_')@!
+#       p(img(src="SnowMonkey.jpg", width="100%"))
     )
     
   ),  #dashboardSidebar
