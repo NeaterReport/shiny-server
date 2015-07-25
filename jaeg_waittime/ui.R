@@ -3,7 +3,7 @@
 dashboardPage(skin = "purple",
               
 # ---- DashBoard Header ----
-  dashboardHeader(title = "JAEG Wait Time",
+  dashboardHeader(title = "CIHI Wait Time",
                   dropdownMenu(type = "messages",
                                messageItem(
                                  from = "Emelie & Ben",
