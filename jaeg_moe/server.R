@@ -30,6 +30,7 @@ function(input, output, clientData, session) {
 # ---- MOE for Proportion ----
   
   # Calculate values for info box
+  
   moe_p_df <- reactive({
      data.frame(x = 1.96 * sqrt((input$p * (1-input$p)) / input$nn),
      y = 1.96 * sqrt((input$p * (1-input$p)) / input$nn) * sqrt((input$N-input$nn) / (input$N-1))
@@ -76,24 +77,30 @@ function(input, output, clientData, session) {
   
   # Create values for valueBox
   output$moe_prop <- renderValueBox({
+    # Assign the value within so that it is in sync
+    moe = 1.96 * sqrt((input$p * (1-input$p)) / input$nn)
     # Adjust the colour to show good or bad MoE
-    status_colour <- ifelse(moe_p_df()[1] < .051, "green", "yellow")
-    valueBox(
-      value = paste("+/-", sprintf("%2.2f%%", moe_p_df()[1] * 100), " "),
-      subtitle = "MOE",
-      icon = icon("eye"),
-      color = status_colour
-    )
+      status_colour <- ifelse(moe < .051, "green", "yellow")
+      valueBox(
+        value = paste("+/-", sprintf("%2.2f%%", moe * 100), " "),
+        subtitle = "MOE",
+        icon = icon("eye"),
+        color = ifelse(length(status_colour)==0, "green", status_colour)
+      )
+    
+
   })
   
   output$moe_fpc_prop <- renderValueBox({
+    # Assign the value within so that it is in sync
+    moe <- 1.96 * sqrt((input$p * (1-input$p)) / input$nn) * sqrt((input$N-input$nn) / (input$N-1))
     # Adjust the colour to show good or bad MoE
-    status_colour <- ifelse(moe_p_df()[2] < .051, "green", "yellow")
+    status_colour <- ifelse(moe < .051, "green", "yellow")
     valueBox(
-      value = paste("+/-", sprintf("%2.2f%%", moe_p_df()[2] * 100), " "),
+      value = paste("+/-", sprintf("%2.2f%%", moe * 100), " "),
       subtitle = "MOE with FPC",
       icon = icon("eye"),
-      color = status_colour
+      color = ifelse(length(status_colour)==0, "green", status_colour)
     )
   })
   
@@ -178,24 +185,30 @@ function(input, output, clientData, session) {
   
   # Create values for valueBox
   output$moe_mean <- renderValueBox({
+    # Assign the value within so that it is in sync
+    moe = 1.96 * input$std / sqrt(input$n_mean)
+    
     # Adjust the colour to show good or bad MoE
-    status_colour <- ifelse(moe_m_df()[1] < .051, "green", "yellow")
+    status_colour <- ifelse(moe < .051, "green", "yellow")
     valueBox(
-      value = round(moe_m_df()[1],3),
+      value = round(moe,3),
       subtitle = "MOE",
       icon = icon("eye"),
-      color = status_colour
+      color = ifelse(length(status_colour)==0, "green", status_colour)
     )
   })
   
   output$moe_fpc_mean <- renderValueBox({
+    # Assign the value within so that it is in sync
+    moe = (1.96 * input$std / sqrt(input$n_mean)) * (sqrt((input$N_mean-input$n_mean) / (input$N_mean-1)))
+    
     # Adjust the colour to show good or bad MoE
-    status_colour <- ifelse(moe_m_df()[2] < .051, "green", "yellow")
+    status_colour <- ifelse(moe < .051, "green", "yellow")
     valueBox(
-      value = round(moe_m_df()[2],3),
+      value = round(moe,3),
       subtitle = "MOE with FPC",
       icon = icon("eye"),
-      color = status_colour
+      color = ifelse(length(status_colour)==0, "green", status_colour)
     )
   })
   

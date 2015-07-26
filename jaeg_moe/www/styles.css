@@ -1,0 +1,11 @@
+p {
+  color: gray;
+}
+
+.small-box p {
+  color: white;
+}
+
+.fa-linkedin {
+  color: #8fd6bd;
+}

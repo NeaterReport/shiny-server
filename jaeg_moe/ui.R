@@ -7,9 +7,6 @@
 # 2 - Check confidence interval formula for small sample (t distribution?)
 # 3 - Pick more sensible default values for graphs
 
-# Issue:
-# 1 - The FPC info and value boxes shows error initially when loading
-
 # ---- Load library ----
 
 library(dplyr)
@@ -24,7 +21,7 @@ library(shinydashboard)
 dashboardPage(skin="purple",
 
 # ---- Dashboard Header ----             
-  dashboardHeader(title = "JAEG MoE",
+  dashboardHeader(title = "Margin of Error",
                               
     # Notification and Batches
     dropdownMenu(type = "tasks", badgeStatus = "primary",
@@ -34,6 +31,7 @@ dashboardPage(skin="purple",
  
 # ---- Dashboard Side Bar ----
   dashboardSidebar(
+    includeCSS("www/styles.css"),
                 
     # Customize title
     h4(textInput("caption", "Name Your App", "My Awesome Error!"), align="center"),
@@ -52,7 +50,7 @@ dashboardPage(skin="purple",
                menuSubItem("Mean", tabName = "sample_mean", icon = icon("square-o"))
                ),
       menuItem("", tabName = "aboutus",
-               icon = icon("info"), badgeLabel = "Gotta luv @('_')@!", badgeColor = "orange"),
+               icon = icon("info"), badgeLabel = "About the App", badgeColor = "orange"),
       menuItem("Emelie", href = "https://ca.linkedin.com/pub/emelie-gustafsson/58/930/647", icon = icon("linkedin")),
       menuItem("Ben", href = "https://ca.linkedin.com/in/beneditochou", icon = icon("linkedin"))
     ),
@@ -68,11 +66,11 @@ dashboardPage(skin="purple",
                             "FiveThirtyEight" = 5,
                             "Stata" = 6,
                             "Tufte" = 7),
-                selected = 5),
-    br(),
-    
-    # Gotta have @('_')@!
-    p(img(src="SnowMonkey.jpg", width="100%"))
+                selected = 5)
+#     br(),
+#     
+#     Gotta have @('_')@!
+#     p(img(src="SnowMonkey.jpg", width="100%"))
     
   ), # dashboardSidebar
 
