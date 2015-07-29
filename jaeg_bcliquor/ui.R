@@ -41,6 +41,11 @@ dashboardPage(skin = "purple",
     tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "style.css")),
     includeCSS("www/styles.css"),
     
+    # Call the Sortable javascript library on CDN
+    # This next line add Sortable.min.js to make sortableR works on server :) Thanks to Andy Kipp
+    # see https://groups.google.com/forum/#!topic/shiny-discuss/afbtbhRoofE
+    tags$head(tags$script(src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.2.1/Sortable.min.js")),
+    
     tabItems(
       
       tabItem(tabName = "drink",
