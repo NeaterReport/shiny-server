@@ -20,6 +20,7 @@ library(readxl)
 library(scales)
 library(shiny)
 library(shinydashboard)
+library(sortableR)
 
 # geo related packages
 library(ggmap)

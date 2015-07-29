@@ -39,6 +39,11 @@ dashboardPage(skin = "purple",
   dashboardBody(
     includeCSS("www/styles.css"),
     
+    # Call the Sortable javascript library on CDN
+    # This next line add Sortable.min.js to make sortableR works on server :) Thanks to Andy Kipp
+    # see https://groups.google.com/forum/#!topic/shiny-discuss/afbtbhRoofE
+    tags$head(tags$script(src="//cdnjs.cloudflare.com/ajax/libs/Sortable/1.2.1/Sortable.min.js")),
+    
     tabItems(
       tabItem(tabName = "province",
               
@@ -54,11 +59,11 @@ dashboardPage(skin = "purple",
         fluidPage(
           wellPanel(
             fluidRow(
-              column(width = 6,
+              column(width = 6, id = "sortableInfo",
                 infoBoxOutput("box_trt_rank", width = 4),
                 infoBoxOutput("box_trt_per90", width = 4),
                 infoBoxOutput("box_trt_per50", width = 4)
-              ),
+              ), sortableR("sortableInfo"),
               column(width = 2,
                 selectInput("ui_prov", "Select a Province",
                             choices = c("B.C.", "Alta.", "Sask.", "Man.", 
@@ -77,7 +82,7 @@ dashboardPage(skin = "purple",
             ) # fluidRow
           ), # wellPanel
           
-          fluidRow(
+          fluidRow(id = "sortable",
             box(width = 12, plotOutput("thinLine_graph", height = 100)),
             
             tabBox(title = tagList(shiny::icon("th-large"), "Health Region (2014 only)"),
@@ -92,7 +97,7 @@ dashboardPage(skin = "purple",
             ),
             
             box(plotOutput("area_graph", height = "auto"))
-          )
+          ), sortableR("sortable")
         ) # fluidPage
       ), # tabItem "province"
       
@@ -141,14 +146,14 @@ dashboardPage(skin = "purple",
                 
                 tabPanel("Trend Graph",
                          fluidPage(
-                           fluidRow(
+                           fluidRow(id = "sortable2",
                              box(title = "Met Benchmark", 
                                  plotOutput("trend_mb_graph"), solidHeader = TRUE),
                              box(title = "90th Percentile (Day)", 
                                  plotOutput("trend_90_graph"), solidHeader = TRUE),
                              box(title = "50th Percentile (Day)", 
                                  plotOutput("trend_50_graph"), solidHeader = TRUE) 
-                           )
+                           ), sortableR("sortable2")
                          )
                 ),
                 
