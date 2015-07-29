@@ -38,6 +38,7 @@ dashboardPage(skin = "purple",
   
 # ---- Dashboard Body ----
   dashboardBody(
+    
     tags$head(tags$link(rel = "stylesheet", type = "text/css", href = "style.css")),
     includeCSS("www/styles.css"),
     
