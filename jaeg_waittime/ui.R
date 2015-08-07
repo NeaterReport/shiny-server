@@ -107,7 +107,9 @@ dashboardPage(skin = "purple",
           fluidRow(
             column(width = 8,
                    h3(span(textOutput("trt_selected2", inline=TRUE), 
-                           style = "color: #FF7F0E; font-weight: bold;"), " Coming Soon!")
+                           style = "color: #FF7F0E; font-weight: bold;"), " Coming Soon!"),
+                   p("Each year, The Canadian Institute of Health Information (CIHI) releases wait time data on selected priority procedures and treatments. The Institute compiles this and other information to inform the general public on important health matters and shape public health policy.")
+                   
             ),
             column(width = 4,
                    wellPanel(
