@@ -1,0 +1,186 @@
+---
+title: "CIHI Wait Time Sample Report"
+author: "Emelie & Ben"
+date: "July 23, 2015"
+header-includes:
+- \usepackage{fancyhdr}
+- \pagestyle{fancy}
+- \fancyhead[CO,CE]{This is fancy header}
+- \fancyfoot[CO,CE]{And this is a fancy footer}
+- \fancyfoot[LE,RO]{\thepage}
+---
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+
+# Load packages
+library(readxl)
+library(dplyr)
+library(ggplot2)
+library(directlabels)
+
+library(sp)
+library(ggmap)
+library(maps)
+library(maptools) # read shapefiles
+library(rgdal) # read shapefiles
+library(ggmap)
+library(gpclib) # This has restrictive license, but maybe needed for foritfy if there is no rgeos
+library(rgeos) # Suppose to be a free alternative for gpclib
+library(raster) 
+
+# Import data
+waitTime_prov_df <- read_excel("www/CIHI treatment wait time.xlsx", "To R Prov")
+# Add a dummy indicator
+waitTime_prov_df$MetB <- ifelse(waitTime_prov_df$MetBenchmark > 90, "Met", "Not Met")
+# reorder from west to east using factor
+waitTime_prov_df$Prov <- factor(waitTime_prov_df$Province, 
+                       levels = c("B.C.", "Alta.", "Sask.", "Man.", "Ont.", "Que.", "N.B.", "P.E.I.",
+                                  "N.S.", "N.L.", "Canada"))
+
+# Create subset
+subdata_trt_x_prov_df <- filter(waitTime_prov_df, Treatment == input$ui_trt, Province != "Canada")
+subdata_prov_df <- filter(waitTime_prov_df, Province == input$ui_prov)
+wait_50 <- filter(waitTime_prov_df, Province == input$ui_prov, Treatment == input$ui_trt, Year == 2014)$Percentile50
+
+
+# Read in the shape file
+map_canada <- readShapeSpatial("www/prov4map/prov4map.shp")
+# use Prov_Code as the region ID
+mapo <- fortify(map_canada, region="Prov_Code")
+```
+
+![alt text](`r paste0('www/',gsub("\\.","",input$ui_prov),'_flag.png')`)
+
+## CIHI Wait Time for `r input$ui_trt` in `r input$ui_prov`
+
+This is a sample report based on the [Canadian Institute of Health Information (CIHI)](https://www.cihi.ca/en) wait time data.
+
+We can customize anything you see on the page or on screen, from numbers to formatting, to suit your reporting needs and branding requirements.
+
+Reports are created on the fly based on the province you selected on the dashboard. Right now, you are reading a provincial report on treatment wait time for `r input$ui_prov`, which shows the 50th Percentile wait time for `r input$ui_trt` in 2014 is `r wait_50`.
+
+The same report template creates the document you are reading now, which could be a PDF, Word document, or html page (or an interactive presentation slide!). This affords great flexibility as each format has its strengths and weaknesses.
+
+* PDF report is great when you require precise control of your document layout and fomratting
+* HTML report is perfect when you want to add interactive graphs and elements
+* Word report is best when you want to further fine-tune the style and format of your report
+
+With Neater Report, you are in control. You choose which format you want, all with the click of a button :)
+
+## Data Source 
+
+The wait time data is compiled annually by [CIHI](http://waittimes.cihi.ca).
+
+\pagebreak
+
+## Treatment
+
+**Table** can be added and their stylings can be customized.
+
+Table 1 shows trends of treatment wait time over time for each of the 10 provinces in Canada.
+
+```{r, echo=FALSE, results='asis'}
+kable(head(subdata_trt_x_prov_df[c(1,3,5:8)], 10),
+      digits = 1,
+      caption = paste0("Table 1 - Volume, Benchmark, 50th and 90th Percentile Wait Time of Treatments for ", input$ui_prov, " from 2008 to 2014"),
+      row.names = FALSE,
+      align = c("l",rep("c",6))
+      )
+```
+
+\newpage
+
+**Graph** can be added and positioned anywhere in the report, from a simple bar graph to advanced statistical graphics. Graph can be common to all reports, like this national comparison graph (see Figure 1).
+
+**Figure 1 50th Percentile Wait Time for `r input$ui_trt` by Province between 2008 and 2014**
+
+```{r, echo=FALSE, warning = FALSE}
+ 
+plot_data <- subdata_trt_x_prov_df
+    
+p <- ggplot(plot_data, aes(factor(Year), Percentile50, group=Province, size = Volume)) +
+      geom_line(aes(colour = "Province")) + 
+      geom_line(aes(colour = Region)) + # double plotting trick to get the direct label right
+      theme_bw() + 
+      scale_colour_manual(values=c("grey80","#a6cee3","grey80","#1f78b4", rep("grey80",9),"#b2df8a","black")) + scale_size_continuous(range = c(.3, 5)) + # need to manually set the colour for direct label
+      xlab("") + ylab("50th Percentile (Day)") + 
+      theme(axis.text = element_text(colour = "#1F77B4", size = rel(.7)),
+            axis.title = element_text(colour = "#2CA02C", size = rel(.7)),
+            panel.grid.major = element_line(colour = "grey70", size = .2, linetype = "dotted"),
+            panel.border = element_blank(),
+            legend.key = element_blank(),
+            legend.text = element_text(colour = "grey60"),
+            legend.title = element_text(colour = "#2CA02C"))
+    
+    direct.label(p, list('last.qp', cex=.7))
+```
+
+\newpage
+
+A graph can also be specific to a subreport, such as the `r input$prov` graph shown in Figure 2.
+
+**Figure 2 Wait Time of Various Treatment over Time for `r input$ui_prov` **
+
+```{r echo=FALSE, warning = FALSE, fig.height = 6}
+   
+plot_data <- subdata_prov_df
+    
+  # need to use complete case or else facet has problem with missing
+   # The 90th percentile seem to work fine as a proxy
+   # Might lose some data but
+   plot_data <- plot_data[complete.cases(plot_data$Percentile90),]
+   
+   # to add legend for separate geom line or area without melting or gather
+   # melt won't work because ribbon doens't accept graident in ggplot2 or so they say
+   # see http://stackoverflow.com/questions/10349206/add-legend-to-ggplot2-line-plot
+   
+   ggplot(plot_data, aes(factor(Year), Percentile90, group=factor(Treatment))) + 
+     geom_area(aes(factor(Year), Percentile90, group=factor(Treatment), 
+                   fill = "90th Percentile"), size = 1.3) + 
+     geom_line(aes(factor(Year), Percentile90, group=factor(Treatment),
+                   colour = MetB), size = 1.3) +
+     geom_area(aes(factor(Year), Percentile50, group=factor(Treatment), 
+                   fill = "50th Percentile"), size = 1.3) + 
+     facet_wrap(~Treatment, ncol = 2) + 
+     theme_fivethirtyeight() + 
+     scale_fill_manual("", 
+                       breaks = c("90th Percentile", "50th Percentile"),
+                       values = c("#fee8c8","#fdbb84")) +
+     theme(legend.position = "top",
+           axis.text = element_text(size = rel(.7)),
+           axis.title = element_text(size = rel(.7)),
+           strip.text = element_text(size = rel(.7)),
+           legend.text = element_text(size = rel(.7)),
+           legend.title = element_text(size = rel(.7))) + ylab("") +
+     guides(colour=guide_legend(title = "Met Benchmark?"),
+          fill=guide_legend(title = "Percentile (Days)", nrow=1,byrow=TRUE))
+     
+```
+
+
+\newpage
+
+**Map** such as this choropleth map can be incoporated in a report.
+
+```{r echo=FALSE, warning = FALSE, fig.height = 6, message=FALSE}
+   
+   plot_data <- subdata_trt_x_prov_df
+   
+ # assign id for merging with shapefile
+    plot_data$id <- as.character(plot_data$Prov_Code)
+    
+    # Join the data
+    mapo2 <- left_join(mapo, plot_data)
+    
+    # Map it!
+    ggplot() + geom_polygon(data = filter(mapo2, !is.na(Year)), aes(long, lat, group = group, fill = MetBenchmark/100), color = NA) + facet_wrap(~Year, ncol = 2) + theme_nothing(legend = TRUE) + 
+      scale_fill_distiller(palette = "PuRd", labels = percent,
+                           breaks = pretty_breaks(n = 5), values = c(1,0)) +
+      labs(title = "% Met Brenchmark",
+           fill = "") +  guides(fill = guide_legend(reverse = TRUE)) +
+      theme(strip.background = element_rect(fill = "white"),
+            strip.text = element_text(size = rel(1.2), colour = "grey70"),
+            plot.margin = unit(c(1,1,1,1),"cm"),
+            plot.title=element_text(size = 18, vjust=3, colour = "#2CA02C"))
+   
+```
