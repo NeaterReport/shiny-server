@@ -417,7 +417,9 @@ function(input, output, session) {
     },
     
     content = function(file) {
-      src <- normalizePath('sampleReport.Rmd')
+      src <- normalizePath(switch(input$format,
+        PDF = 'sampleReport.Rmd', HTML = 'sampleReport.Rmd', Word = 'sampleReportW.Rmd'
+      ))
       
       # not sure what this add, as it adds complexity to reading in the data
       # temporarily switch to the temp dir, in case you do not have write

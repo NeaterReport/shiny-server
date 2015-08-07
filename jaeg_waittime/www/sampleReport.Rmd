@@ -1,11 +1,9 @@
 ---
 title: "CIHI Wait Time Sample Report"
 author: "Emelie & Ben"
-date: '`r format(Sys.time(), "%B %d, %Y")`'
+date: "July 23, 2015"
 header-includes:
-- \usepackage[default, osfigures,scale = 1]{opensans} 
 - \usepackage{fancyhdr}
-- \usepackage{ragged2e}
 - \pagestyle{fancy}
 - \fancyhead[CO,CE]{This is fancy header}
 - \fancyfoot[CO,CE]{And this is a fancy footer}
@@ -51,10 +49,7 @@ map_canada <- readShapeSpatial("www/prov4map/prov4map.shp")
 mapo <- fortify(map_canada, region="Prov_Code")
 ```
 
-\centering
 ![alt text](`r paste0('www/',gsub("\\.","",input$ui_prov),'_flag.png')`)
-
-\RaggedRight
 
 ## CIHI Wait Time for `r input$ui_trt` in `r input$ui_prov`
 
@@ -62,7 +57,7 @@ This is a sample report based on the [Canadian Institute of Health Information (
 
 We can customize anything you see on the page or on screen, from numbers to formatting, to suit your reporting needs and branding requirements.
 
-Reports are created on the fly based on the province you selected on the dashboard. Right now, you are reading a provincial report on treatment wait time for `r input$ui_prov`, which shows the 50th Percentile wait time for `r input$ui_trt` in 2014 is `r wait_50` days.
+Reports are created on the fly based on the province you selected on the dashboard. Right now, you are reading a provincial report on treatment wait time for `r input$ui_prov`, which shows the 50th Percentile wait time for `r input$ui_trt` in 2014 is `r wait_50`.
 
 The same report template creates the document you are reading now, which could be a PDF, Word document, or html page (or an interactive presentation slide!). This affords great flexibility as each format has its strengths and weaknesses.
 
@@ -76,7 +71,7 @@ With Neater Report, you are in control. You choose which format you want, all wi
 
 The wait time data is compiled annually by [CIHI](http://waittimes.cihi.ca).
 
-\newpage
+\pagebreak
 
 ## Treatment
 
@@ -99,7 +94,7 @@ kable(head(subdata_trt_x_prov_df[c(1,3,5:8)], 10),
 
 **Figure 1 50th Percentile Wait Time for `r input$ui_trt` by Province between 2008 and 2014**
 
-```{r, echo=FALSE, warning = FALSE, message = FALSE, fig.align='center'}
+```{r, echo=FALSE, warning = FALSE}
  
 plot_data <- subdata_trt_x_prov_df
     
@@ -126,7 +121,7 @@ A graph can also be specific to a subreport, such as the `r input$prov` graph sh
 
 **Figure 2 Wait Time of Various Treatment over Time for `r input$ui_prov` **
 
-```{r echo=FALSE, warning = FALSE, message = FALSE, fig.height = 7.5, fig.align='center'}
+```{r echo=FALSE, warning = FALSE, fig.height = 6}
    
 plot_data <- subdata_prov_df
     
@@ -167,7 +162,7 @@ plot_data <- subdata_prov_df
 
 **Map** such as this choropleth map can be incoporated in a report.
 
-```{r echo=FALSE, warning = FALSE, message=FALSE, fig.height = 7.5, fig.align='center'}
+```{r echo=FALSE, warning = FALSE, fig.height = 6, message=FALSE}
    
    plot_data <- subdata_trt_x_prov_df
    

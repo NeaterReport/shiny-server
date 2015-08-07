@@ -3,7 +3,6 @@ title: "CIHI Wait Time Sample Report"
 author: "Emelie & Ben"
 date: '`r format(Sys.time(), "%B %d, %Y")`'
 header-includes:
-- \usepackage[default, osfigures,scale = 1]{opensans} 
 - \usepackage{fancyhdr}
 - \usepackage{ragged2e}
 - \pagestyle{fancy}
@@ -51,10 +50,7 @@ map_canada <- readShapeSpatial("www/prov4map/prov4map.shp")
 mapo <- fortify(map_canada, region="Prov_Code")
 ```
 
-\centering
 ![alt text](`r paste0('www/',gsub("\\.","",input$ui_prov),'_flag.png')`)
-
-\RaggedRight
 
 ## CIHI Wait Time for `r input$ui_trt` in `r input$ui_prov`
 
@@ -78,6 +74,7 @@ The wait time data is compiled annually by [CIHI](http://waittimes.cihi.ca).
 
 \newpage
 
+
 ## Treatment
 
 **Table** can be added and their stylings can be customized.
@@ -99,7 +96,7 @@ kable(head(subdata_trt_x_prov_df[c(1,3,5:8)], 10),
 
 **Figure 1 50th Percentile Wait Time for `r input$ui_trt` by Province between 2008 and 2014**
 
-```{r, echo=FALSE, warning = FALSE, message = FALSE, fig.align='center'}
+```{r, echo=FALSE, warning = FALSE, message=FALSE}
  
 plot_data <- subdata_trt_x_prov_df
     
@@ -126,7 +123,7 @@ A graph can also be specific to a subreport, such as the `r input$prov` graph sh
 
 **Figure 2 Wait Time of Various Treatment over Time for `r input$ui_prov` **
 
-```{r echo=FALSE, warning = FALSE, message = FALSE, fig.height = 7.5, fig.align='center'}
+```{r echo=FALSE,  warning = FALSE, message=FALSE, fig.height = 6}
    
 plot_data <- subdata_prov_df
     
@@ -162,12 +159,11 @@ plot_data <- subdata_prov_df
      
 ```
 
-
 \newpage
 
 **Map** such as this choropleth map can be incoporated in a report.
 
-```{r echo=FALSE, warning = FALSE, message=FALSE, fig.height = 7.5, fig.align='center'}
+```{r echo=FALSE, warning = FALSE, message=FALSE, fig.height = 6}
    
    plot_data <- subdata_trt_x_prov_df
    
