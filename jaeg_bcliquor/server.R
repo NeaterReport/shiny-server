@@ -471,7 +471,7 @@ function(input, output, session) {
   # Update UI doesn't work for some reason
   # need to use renderUI to make new one
   output$ui_whatclass2 <- renderUI({
-    selectizeInput("whatminorclass2", "More specific",
+    selectizeInput("whatminorclass2", "I like ...",
     choices = unique(minorclass_df()$minorclass), 
     selected = NULL, multiple = FALSE)
   })
@@ -893,6 +893,7 @@ function(input, output, session) {
   })
   
   vis %>% bind_shiny("plot_liquor_explorer")
+  
   
   # Count the number of liquor selected
   output$n_liquor <- renderText({nrow((explorer_df()))})

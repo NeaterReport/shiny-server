@@ -17,3 +17,16 @@ p {
 .fa-linkedin {
   color: #8fd6bd;
 }
+
+.fa-info-circle{
+  color: #8fd6bd;
+}
+
+/* To remove the border and shadow for well panel */
+#transparent{
+ background-color: transparent;
+ border: transparent;
+ border-radius: 0px;
+  -webkit-box-shadow: inset 0 0 0 0;
+box-shadow: inset 0 0 0 0
+}

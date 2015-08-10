@@ -21,10 +21,10 @@ dashboardPage(skin = "purple",
     
     # Create side menu         
     sidebarMenu(
-      menuItem("Wine and Beer!", tabName = "drink", 
-               icon = icon("glass")),
       menuItem("Liqour Explorer", tabName = "explorer",
                icon = icon("cube"), badgeLabel = "New", badgeColor = "teal"),
+      menuItem("Wine and Beer!", tabName = "drink", 
+               icon = icon("glass")),
       menuItem("", tabName = "aboutus",
                icon = icon("info"), badgeLabel = "About the App", badgeColor = "orange"),
       menuItem("Emelie", href = "https://ca.linkedin.com/pub/emelie-gustafsson/58/930/647", icon = icon("linkedin")),
@@ -49,6 +49,74 @@ dashboardPage(skin = "purple",
     
     tabItems(
       
+      tabItem(tabName = "explorer",
+              fluidRow(
+                column(9,
+                       wellPanel(id = "transparent",
+                         fluidRow(
+                           
+                           p(HTML('<i class="fa fa-info-circle" id="infopop"></i>')," Explore the ", strong("BC Liquor Store"), " collection with our interactive graph. Find your favorites or discover new drinks by price, alcohol content, or sweetness ratings."),
+                           
+                           bsPopover("infopop", "Hover Me for More!", "Hover over any dots in the graph to see more information about your choice, including photo and customer rating!", trigger = "hover", placement = "bottom"),
+                           
+                           column(width=6,
+                             selectInput("xvar", "X-axis variable", 
+                                         choices = c("Price" = "price",
+                                                     "Alcohol %" = "alcoholper", 
+                                                     "Sweetness" = "sweetness"), 
+                                         selected = "price")
+                           ),
+                           
+                           # Add tooltip
+                           bsTooltip("xvar", "This select which information to show on the horizontal or x axis", "top"),
+                           
+                           column(width=6,
+                             selectInput("yvar", "Y-axis variable", 
+                                         choices = c("Price" = "price",
+                                                     "Alcohol %" = "alcoholper", 
+                                                     "Sweetness" = "sweetness"), 
+                                         selected = "alcoholper") 
+                           ),
+                           
+                           # Add tooltip
+                           bsTooltip("yvar", "This select which information to show on the vertical or y axis", "top")
+                         )
+                       ),
+                       ggvisOutput("plot_liquor_explorer")
+                ),
+                
+                column(3,
+                       wellPanel(
+                         h2("Liquor Explorer"),
+                         h4("Showing me",strong(textOutput("n_liquor", inline = TRUE), 
+                                                style='color: orange;'), 
+                            "different liquors", style = 'color: #1F77B4;'),
+                         # uiOutput("ui_price_slider"),
+                         sliderInput("price_e", "How Expensive?",
+                                     0, 30000, value = c(0, 30250)),
+                         sliderInput("alcohol_e", "How Strong?", 
+                                     0, 100, value = c(0, 100)),
+                         sliderInput("sweetness_e", "How Sweet?",
+                                     0, 10, value = c(0, 10)),
+                         helpText("Uncheck this box if you want to only look at liquors with a sweetness rating."),
+                         checkboxInput("includesweet", "Sweet or Not?",
+                                       value = TRUE),
+                         selectizeInput("country_e", "Pick Your Country of Choice",
+                                        choices = c(sort(unique(bcliquor_df$country))),
+                                        selected = "Canada",
+                                        options = list(placeholder = "Leave blank to see'em all")),
+                         helpText("Leave blank to see'm all"),
+                         selectizeInput("class_e", "Class of Liquor",
+                                        choices = unique(bcliquor_df$class),
+                                        selected = "Wine",
+                                        options = list(placeholder = "Leave blank to see'em all")),
+                         helpText("Leave blank to see'm all"),
+                         textInput("name_e", "Product Name (e.g., Johnnie Walker - Red Label)")
+                       )
+                )
+              ) # fluidRow
+      ), # tabItem "Explorer"
+      
       tabItem(tabName = "drink",
         tabBox(width = 12,
           title = "Wine and Beer",
@@ -57,6 +125,8 @@ dashboardPage(skin = "purple",
                
           tabPanel("Sample by Country", icon = icon("map-marker"),
             fluidPage(
+              p(HTML('<i class="fa fa-info-circle" id="infopop2"></i>')," Dive deeper into the ", strong("BC Liqour Store collection"), ", sample your favorites by country, through top and bottom 10 lists, or via varoius class (type of liquors). If you fancy, download the entire data and explore them for yourself."),
+              bsPopover("infopop2", "Did you know?", "You can drag and move the graphs around? Try rearranging the graphs to create your very own ultimate liquor dashboard!", trigger = "hover", placement = "bottom"),
               fluidRow(
                 selectInput("country", "Pick a Country",
                                choices = sort(unique(bcliquor_df$country)), 
@@ -65,15 +135,15 @@ dashboardPage(skin = "purple",
               fluidRow(id = "sortable",
                        box(title = "What do they sell?",
                            plotOutput("country_tmap")),
-                       box(title = "Top 10 Price", 
+                       box(title = "What are the most expensive liquors?", 
                            plotOutput("country_price_top10")),
-                       box(title = "Top 10 Alcohol Content",
+                       box(title = "Which liquors have the highest alcohol content? ",
                            plotOutput("country_alcohol_top10")),
-                       box(title = "Top 10 Sweetness",
+                       box(title = "Which are the sweetest liquors?",
                            plotOutput("country_sweet_top10")),
-                       box(title = "Price Distribution",
+                       box(title = "Show me the price range by liquor type",
                            plotOutput("country_violin", click = "plot_click")),
-                       box(title = "Price for:",
+                       box(title = "Show me the price range for:",
                            selectizeInput("whatclass", NULL,
                                           choices = NULL, selected = NULL),
                            plotOutput("class_violin"))
@@ -84,14 +154,14 @@ dashboardPage(skin = "purple",
           tabPanel("Top and Bottom", icon = icon("sort-amount-desc"),
             fluidPage(
               fluidRow(id = "sorty",
-                selectizeInput("whatdata", "Which top and bottom 10 data you wanna look?",
+                selectizeInput("whatdata", "Which top and bottom 10 list you wanna look?",
                                choices = c("Price", "Alcohol", "Sweetness"),
                                selected = "Price"),
-                box(HTML("<img src='wine.png' height = 25> Top 10 Wine"),
+                box(HTML("<img src='wine.png' height = 25> Show me the top 10 Wine"),
                     status = "danger",
                     plotOutput("top10_wine_plot"),
                     collapsible = TRUE),
-                box(HTML("<img src='wine.png' height = 25> Bottom 10 Wine"),
+                box(HTML("<img src='wine.png' height = 25> Show me the bottom 10 Wine"),
                     status = "danger",
                     plotOutput("bottom10_wine_plot"),
                     collapsible = TRUE),
@@ -111,11 +181,11 @@ dashboardPage(skin = "purple",
                     status = "primary",
                     plotOutput("bottom10_spirits_plot"),
                     collapsible = TRUE),
-                box(HTML("<img src='cocktail.png' height = 25> Top 10 Refreshment"),  
+                box(HTML("<img src='cocktail.png' height = 25> Show me the top 10 Refreshment"),  
                     status = "success",
                     plotOutput("top10_refresh_plot"),
                     collapsible = TRUE),
-                box(HTML("<img src='cocktail.png' height = 25> Bottom 10 Refreshment"), 
+                box(HTML("<img src='cocktail.png' height = 25> Show me the bottom 10 Refreshment"), 
                     status = "success",
                     plotOutput("bottom10_refresh_plot"),
                     collapsible = TRUE)
@@ -127,11 +197,12 @@ dashboardPage(skin = "purple",
             tabsetPanel(
           
               tabPanel("By Class",
-                fluidPage(id = "sortme",
+                fluidPage(
+                  br(),
                   fluidRow(
                     column(width = 3,
                       selectizeInput("whatclass2", 
-                                     "What kind of Liqour you fancy?",
+                                     "What kind of liqour you fancy?",
                                      choices = c("Wine","Spirits","Beer",
                                                  "Refreshment Beverage",
                                                  "De-alcoholized Wine",
@@ -145,11 +216,15 @@ dashboardPage(skin = "purple",
                     )
                     )
                   ),
-                  box(leafletOutput("map_by_class")),
-                  box(dataTableOutput("class_country")),
+                  column(width = 12, leafletOutput("map_by_class")),
+                  box(width = 12,
+                      br(),br(),
+                      p(HTML('<i class="fa fa-info-circle"></i>'),
+                        "This table is interactive, click on a row to query the ", strong("BC Liquore Store"), " website for additional information about the type of liquors avaliable from that country. The relevant webpage will be displayed below the table. To explore another country, deselect the active row before selecting a new row."),
+                      dataTableOutput("class_country")),
                   box(width = 12,
                       htmlOutput("url")
-                  ), sortableR("sortme")
+                  )
                 )
               ), # tabPanel "By Class"
               
@@ -161,7 +236,7 @@ dashboardPage(skin = "purple",
                   ),
                   box(width = 7,
                     p(HTML('<i class="fa fa-info-circle"></i>'),
-                      "The graph is interactive, click on the dimaond to query the BC Liquore Store website."),
+                      "The diamond graph is interactive, click on the diamonds to query the ", strong("BC Liquore Store"), " website for additional information about the type of liquors avaliable from that country."),
                     p("Showing live query of", strong(textOutput("diamond_check", inline = TRUE), 
                                                       style = 'color: orange;'), "."), 
                     htmlOutput("url2")
@@ -186,61 +261,6 @@ dashboardPage(skin = "purple",
         ) # tabBox
       ), # tabPanel "Drink"
       
-      tabItem(tabName = "explorer",
-        fluidRow(
-          column(9,
-            wellPanel(
-             fluidRow(
-               box(
-                 selectInput("xvar", "X-axis variable", 
-                             choices = c("Price" = "price",
-                                         "Alcohol %" = "alcoholper", 
-                                         "Sweetness" = "sweetness"), 
-                             selected = "price")
-               ),
-               box(
-                 selectInput("yvar", "Y-axis variable", 
-                             choices = c("Price" = "price",
-                                         "Alcohol %" = "alcoholper", 
-                                         "Sweetness" = "sweetness"), 
-                             selected = "alcoholper") 
-               )
-             )
-            ),
-            ggvisOutput("plot_liquor_explorer")
-          ),
-          
-          column(3,
-            wellPanel(
-              h4("Showing me",strong(textOutput("n_liquor", inline = TRUE), 
-                                     style='color: orange;'), 
-                 "different liquors", style = 'color: #1F77B4;'),
-              # uiOutput("ui_price_slider"),
-              sliderInput("price_e", "How Expensive?",
-                          0, 30000, value = c(0, 30250)),
-              sliderInput("alcohol_e", "How Strong?", 
-                          0, 100, value = c(0, 100)),
-              sliderInput("sweetness_e", "How Sweet?",
-                          0, 10, value = c(0, 10)),
-              helpText("If you want to only look at liquor with a sweetness rating, uncheck this box"),
-              checkboxInput("includesweet", "Sweet or Not?",
-                            value = TRUE),
-              selectizeInput("country_e", "Pick Your Country of Choice",
-                             choices = c(sort(unique(bcliquor_df$country))),
-                             selected = "Canada",
-                             options = list(placeholder = "Leave blank to see'em all")),
-              helpText("Leave blank to see'm all"),
-              selectizeInput("class_e", "Class of Liquor",
-                             choices = unique(bcliquor_df$class),
-                             selected = "Wine",
-                             options = list(placeholder = "Leave blank to see'em all")),
-              helpText("Leave blank to see'm all"),
-              textInput("name_e", "Product Name (e.g., Johnnie Walker - Red Label)")
-            )
-          )
-        ) # fluidRow
-      ), # tabItem "Explorer"
-
       tabItem(tabName = "aboutus",
         fluidPage(
           column(width = 5, offset = 1,
