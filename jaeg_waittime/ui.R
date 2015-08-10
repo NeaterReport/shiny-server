@@ -78,11 +78,16 @@ dashboardPage(skin = "purple",
               column(width = 2,
                  sliderInput("ui_year", "Select a Year", 
                              min =  2008, max = 2014, value = 2014, step = 1)
+              ),
+              column(width = 12,
+                p("The Canadian Institute of Health Information (CIHI) wait time data is the most comprehensive data on wait time for selected priority procedures and treatments across Canada. For selected provinces, information is avaliable at the health region level to examine regional differences.")
               )
             ) # fluidRow
           ), # wellPanel
           
+          
           fluidRow(id = "sortable",
+                   
             box(width = 12, plotOutput("thinLine_graph", height = 100)),
             
             tabBox(title = tagList(shiny::icon("th-large"), "Health Region (2014 only)"),
@@ -123,15 +128,15 @@ dashboardPage(skin = "purple",
           fluidRow(
             tabBox(title = tagList(shiny::icon("flag"), "National Perspective"),
                    side = "left", height = "auto", width = 12,
-                   selected = "Comparison Graph (Time)",
+                   selected = "Compare Wait Time Overtime",
                 
-                tabPanel("Comparison Graph (Time)", 
+                tabPanel("Compare Wait Time Overtime", 
                    fluidPage(
                      fluidRow(plotOutput("compare_graph_yr", height = 800))
                    )
                 ),
                 
-                tabPanel("Comparison Graph (Trt)", 
+                tabPanel("Compare Wait Time by Treatment", 
                   fluidPage(
                     fluidRow(
                      column(offset = 8, width = 4,
@@ -146,7 +151,7 @@ dashboardPage(skin = "purple",
                   )
                 ),
                 
-                tabPanel("Trend Graph",
+                tabPanel("Overall Trend",
                          fluidPage(
                            fluidRow(id = "sortable2",
                              box(title = "Met Benchmark", 
