@@ -15,14 +15,18 @@ function(input, output, clientData, session) {
   # Dynamic pop UI depending on the no. of observations
   output$ui_p_pop <- renderUI({
     minN <- input$nn
-    sliderInput("N",label = "Population Size:",
-                min = minN, max = 10000, value = 10000, step = 500)
+    #sliderInput("N",label = "Population Size:",
+    #            min = minN, max = 10000, value = 10000, step = 500)
+    numericInput("N",label = "Population Size:", value = 100000,
+                 min = minN,  step = 1000)
   })
   
   output$ui_mean_pop <- renderUI({
     minN <- input$n_mean
-    sliderInput("N_mean",label = "Population Size:",
-                min = minN, max = 10000, value = 10000, step = 500)
+    #sliderInput("N_mean",label = "Population Size:",
+    #            min = minN, max = 10000, value = 10000, step = 500)
+    numericInput("N_mean",label = "Population Size:", value = 100000,
+                 min = minN,  step = 1000)
   })
 
 # ---- Calculate MOE ---- 
@@ -55,6 +59,11 @@ function(input, output, clientData, session) {
   
   # Plot MoE by sample size
   output$moe_prop_plot <- renderPlot({
+    
+    validate(
+      need((!is.na(input$p) & !is.na(input$nn)), "Please provide sample size and proportion")
+    )
+    
       min <- input$nn
       gg <- ggplot(data.frame(n = c(min * 2/3, min * 3/2)), aes(n)) +
       scale_y_continuous(labels = percent) +
@@ -77,14 +86,19 @@ function(input, output, clientData, session) {
   
   # Create values for valueBox
   output$moe_prop <- renderValueBox({
+    validate(
+      need((!is.na(input$p) & !is.na(input$nn)), "Please provide sample size and proportion")
+    )
     # Assign the value within so that it is in sync
     moe = 1.96 * sqrt((input$p * (1-input$p)) / input$nn)
     # Adjust the colour to show good or bad MoE
-      status_colour <- ifelse(moe < .051, "green", "yellow")
+      status_colour <- ifelse(moe <= .050, "green", "yellow")
+      status_word <- ifelse(moe <= .050, "Good", "Poor")
+      status_icon <- ifelse(moe <= .050, "thumbs-o-up", "thumbs-o-down")
       valueBox(
-        value = paste("+/-", sprintf("%2.2f%%", moe * 100), " "),
-        subtitle = "MOE",
-        icon = icon("eye"),
+        value = paste("+/-", sprintf("%2.2f%%", moe * 100)),
+        subtitle = paste(status_word, " MOE"),
+        icon = icon(status_icon),
         color = ifelse(length(status_colour)==0, "green", status_colour)
       )
     
@@ -92,23 +106,28 @@ function(input, output, clientData, session) {
   })
   
   output$moe_fpc_prop <- renderValueBox({
+    validate(
+      need((!is.na(input$p) & !is.na(input$nn)), "Please provide sample size and proportion")
+    )
     # Assign the value within so that it is in sync
     moe <- 1.96 * sqrt((input$p * (1-input$p)) / input$nn) * sqrt((input$N-input$nn) / (input$N-1))
     # Adjust the colour to show good or bad MoE
-    status_colour <- ifelse(moe < .051, "green", "yellow")
+    status_colour <- ifelse(moe <= .050, "green", "yellow")
+    status_word <- ifelse(moe <= .050, "Good", "Poor")
+    status_icon <- ifelse(moe <= .050, "thumbs-o-up", "thumbs-o-down")
     valueBox(
-      value = paste("+/-", sprintf("%2.2f%%", moe * 100), " "),
-      subtitle = "MOE with FPC",
-      icon = icon("eye"),
+      value = paste("+/-", sprintf("%2.2f%%", moe * 100)),
+      subtitle = paste(status_word, " MOE with FPC"),
+      icon = icon(status_icon),
       color = ifelse(length(status_colour)==0, "green", status_colour)
     )
   })
   
   output$n_prop <- renderValueBox({
     valueBox(
-      value = input$nn,
+      value = format(input$nn,big.mark = ","),
       subtitle = "Sample Size",
-      icon = icon("eye")
+      icon = icon("male")
     )
   })
   
@@ -139,6 +158,11 @@ function(input, output, clientData, session) {
   
   # Plot MoE by sample size
   output$moe_mean_plot <- renderPlot({
+    
+    validate(
+      need((!is.na(input$std) & !is.na(input$n_mean)), "Please provide sample size and standard deviation")
+    )
+    
     min <- input$n_mean
     gg <- ggplot(data.frame(n = c(min - .5 * min, min + .5 * min)), aes(n)) +
       scale_y_continuous() +
@@ -161,6 +185,10 @@ function(input, output, clientData, session) {
     
   # Plot mean +/- confidence interval
   output$moe_mean_CI_plot <- renderPlot({
+    
+    validate(
+      need((!is.na(input$std) & !is.na(input$n_mean)), "Please provide sample size and standard deviation")
+    )
     
     # I think we need to switch to the t-distribution when the sample size is small
     df <- data.frame(mean = input$mean, se = input$std / sqrt(input$n_mean), 
@@ -185,29 +213,37 @@ function(input, output, clientData, session) {
   
   # Create values for valueBox
   output$moe_mean <- renderValueBox({
+    validate(
+      need((!is.na(input$std) & !is.na(input$n_mean)), "Please provide sample size and standard deviation")
+    )
+    
     # Assign the value within so that it is in sync
     moe = 1.96 * input$std / sqrt(input$n_mean)
     
     # Adjust the colour to show good or bad MoE
-    status_colour <- ifelse(moe < .051, "green", "yellow")
+    status_colour <- ifelse(moe <= .050, "green", "yellow")
     valueBox(
-      value = round(moe,3),
+      value = paste("+/-", round(moe,3)),
       subtitle = "MOE",
-      icon = icon("eye"),
+      icon = icon("dot-circle-o"),
       color = ifelse(length(status_colour)==0, "green", status_colour)
     )
   })
   
   output$moe_fpc_mean <- renderValueBox({
+    validate(
+      need((!is.na(input$std) & !is.na(input$n_mean)), "Please provide sample size and standard deviation")
+    )
+    
     # Assign the value within so that it is in sync
     moe = (1.96 * input$std / sqrt(input$n_mean)) * (sqrt((input$N_mean-input$n_mean) / (input$N_mean-1)))
     
     # Adjust the colour to show good or bad MoE
-    status_colour <- ifelse(moe < .051, "green", "yellow")
+    status_colour <- ifelse(moe <= .050, "green", "yellow")
     valueBox(
-      value = round(moe,3),
+      value = paste("+/-", round(moe,3)),
       subtitle = "MOE with FPC",
-      icon = icon("eye"),
+      icon = icon("dot-circle-o"),
       color = ifelse(length(status_colour)==0, "green", status_colour)
     )
   })
@@ -238,11 +274,11 @@ function(input, output, clientData, session) {
   })
   
   output$samplesize <- renderInfoBox({
-    infoBox("Sample Size", round(sample_need() / input$rr), icon = icon("circle"), color = "yellow")
+    infoBox("Sample Size", format(round(sample_need() / input$rr),big.mark = ","), icon = icon("male"))
   })
   
   output$samplesizefpc <- renderInfoBox({
-    infoBox("Sample Size with FPC", round(sample_need_withfpc() / input$rr), icon = icon("square"))
+    infoBox("Sample Size with FPC", format(round(sample_need_withfpc() / input$rr),big.mark = ","), icon = icon("square"))
   })
   
   # Make Sample Size Graph
@@ -264,8 +300,8 @@ function(input, output, clientData, session) {
       stat_function(fun = sample_varymoe_90_fn, geom = "line", aes(colour = "90")) +
       stat_function(fun = sample_varymoe_80_fn, geom = "line", aes(colour = "80")) +
       stat_function(fun = sample_varymoe_50_fn, geom = "line", aes(colour = "50")) +
-      xlab("Sample Size") + 
-      ylab("Margin of Error") +
+      ylab("Sample Size") + 
+      xlab("Margin of Error") +
       theme_fivethirtyeight() +  scale_colour_manual("Confidence Level", values = c("#a1d99b", "#74c476", "#41ab5d", "#238b45", "#005a32"), label = c("50%", "80%", "90%", "95%", "99%"))
     # see http://stackoverflow.com/questions/19950219/using-legend-with-stat-function-in-ggplot2
     # to add legend to function line
@@ -300,12 +336,12 @@ function(input, output, clientData, session) {
   })
   
   output$samplesize_mean <- renderInfoBox({
-    infoBox("Sample Size", round(sample_mean_need() / input$rr_mean), icon = icon("circle"), color = "yellow")
+    infoBox("Sample Size", format(round(sample_mean_need() / input$rr_mean),big.mark = ","), icon = icon("male"))
   })
   
   # Don't know how!
   output$samplesizefpc_mean <- renderInfoBox({
-    infoBox("Sample Size", round(sample_mean_need_withfpc() / input$rr_mean), icon = icon("circle"))
+    infoBox("Sample Size", format(round(sample_mean_need_withfpc() / input$rr_mean),big.mark = ","), icon = icon("circle"))
   })
   
   # Make Sample Size Graph
@@ -319,6 +355,11 @@ function(input, output, clientData, session) {
   # Plot Sample size by confidence level
   
   output$samplesize_mean_plot <- renderPlot({
+    
+    validate(
+      need((!is.na(input$dmoe_mean) & input$dmoe_mean != 0), "Please provide your desire margin of error")
+    )
+    
     min <- input$sample_mean_range[1]
     max <- input$sample_mean_range[2]
     gg <- ggplot(data.frame(sd = c(min, max)), aes(sd)) +
@@ -327,8 +368,8 @@ function(input, output, clientData, session) {
       stat_function(fun = sample_mean_varymoe_90_fn, geom = "line", aes(colour = "90")) +
       stat_function(fun = sample_mean_varymoe_80_fn, geom = "line", aes(colour = "80")) +
       stat_function(fun = sample_mean_varymoe_50_fn, geom = "line", aes(colour = "50")) +
-      xlab("Sample Size") + 
-      ylab("Margin of Error") +
+      ylab("Sample Size") + 
+      xlab("Margin of Error") +
       theme_fivethirtyeight() +  scale_colour_manual("Confidence Level", values = c("#a1d99b", "#74c476", "#41ab5d", "#238b45", "#005a32"), label = c("50%", "80%", "90%", "95%", "99%"))
     # see http://stackoverflow.com/questions/19950219/using-legend-with-stat-function-in-ggplot2
     # to add legend to function line

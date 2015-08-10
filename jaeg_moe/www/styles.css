@@ -1,3 +1,225 @@
+
+/* box header */
+
+.box-header{
+  background-color: #8fd6bd !important;
+}
+
+.box.box-solid.box-primary {
+    border: 0px solid  #8fd6bd !important;
+}
+
+/* This is the active sidebar selection */
+.treeview .active {
+    background-color: #8fd6bd;;
+}
+
+/* The nav = top */
+.skin-purple .main-header .navbar .sidebar-toggle:hover {
+    color: #8fd6bd;
+    background: white;
+}
+
+/* this is the sidebar list color */
+.skin-purple .sidebar-menu>li.active>a, .skin-purple .sidebar-menu>li:hover>a {
+    color: #fff;
+    background: #9bcfe4;
+    border-left-color: #25a8a2
+}
+
+.skin-purple .sidebar-menu>li>.treeview-menu {
+    margin: 0 1px;
+    background: #9bcfe4;
+}
+
+/* the sidebar list color */
+.skin-purple .sidebar a {
+    color: #ce2d2d;
+}
+
+/* The tree color */
+.skin-purple .treeview-menu>li>a {
+    color: white;
+}
+
+.skin-purple .treeview-menu>li.active>a, .skin-purple .treeview-menu>li>a:hover {
+    color: #ce2d2d;
+}
+
+.skin-purple .main-header .navbar {
+  background-color: #8fd6bd;
+}
+
+.skin-purple .main-header .logo {
+    background-color: #8fd6bd;
+    color: #fff;
+    border-bottom: 0 solid transparent
+}
+
+.skin-purple .main-header .logo:hover {
+    color: #8fd6bd;
+    background: white;
+}
+
+.main-sidebar {
+  background-color: white !important;
+}
+
+.sidebar{
+  background-color: white;
+  color: #8fd6bd;
+}
+
+/* Make the ValueBox Smaller */
+
+
+.small-box.bg-green {
+  background-color: #8fd6bd !important;
+}
+
+.small-box.bg-yellow {
+  background-color: #d68fa8 !important;
+}
+
+.small-box {
+  background-color: #9bcfe4 !important;
+}
+
+.small-box .icon-large {
+  position: absolute;
+  height: 50px;
+  top: 0px;
+  bottom: 0px;
+  right: 5px;
+  font-size: 50px;
+  color: rgba(0, 0, 0, 0.15);
+}
+
+.small-box {
+    border-radius: 2px;
+    height: 60px;
+    width: 100%;
+    position: relative;
+    display: inline-block;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .1)
+}
+
+.small-box>.inner {
+    padding: 2px
+}
+
+.small-box>.small-box-footer {
+    position: relative;
+    text-align: center;
+    padding: 3px 0;
+    color: #fff;
+    color: rgba(255, 255, 255, .8);
+    display: block;
+    z-index: 10;
+    background: rgba(0, 0, 0, .1);
+    text-decoration: none
+}
+
+.small-box>.small-box-footer:hover {
+    color: #fff;
+    background: rgba(0, 0, 0, .15)
+}
+
+.small-box h3 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 10px;
+    white-space: nowrap;
+    padding: 0
+}
+
+.small-box p {
+    font-size: 14px
+}
+
+.small-box p>small {
+    display: inline-block;
+    color: #f9f9f9;
+    font-size: 13px;
+    margin-top: 5px
+}
+
+.small-box h3, .small-box p {
+    z-index: 5px
+}
+
+.small-box .icon {
+    -webkit-transition: all .3s linear;
+    -o-transition: all .3s linear;
+    transition: all .3s linear;
+    position: absolute;
+    top: -10px;
+    right: 10px;
+    z-index: 0;
+    font-size: 90px;
+    color: rgba(0, 0, 0, .15)
+    height: 60px;
+    width: 60px;
+}
+
+.small-box:hover {
+    text-decoration: none;
+    color: #f9f9f9
+}
+
+.small-box:hover .icon {
+    font-size: 95px
+}
+
+
+/* Make the infoBox smaller */
+.info-box {
+    display: block;
+    min-height: 60px;
+    background: #fff;
+    width: 100%;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+    border-radius: 2px;
+    margin-bottom: 15px
+}
+
+.info-box-icon {
+    border-radius: 1px 0 0 1px;
+    display: block;
+    float: left;
+    height: 60px;
+    width: 60px;
+    text-align: center;
+    font-size: 60px;
+    line-height: 60px;
+    background: rgba(0, 0, 0, .2)
+}
+
+.info-box-icon.bg-aqua{
+  background-color: #9bcfe4 !important;
+}
+
+.info-box-content {
+    padding: 5px 5px;
+    margin-left: 60px
+}
+
+.info-box-number {
+    display: block;
+    font-weight: 600;
+    font-size: 15px
+}
+
+.info-box-text, .progress-description {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis
+}
+
 p {
   color: gray;
 }
@@ -8,4 +230,8 @@ p {
 
 .fa-linkedin {
   color: #8fd6bd;
+}
+
+.fa-linkedin:hover {
+  color: white !important;
 }
