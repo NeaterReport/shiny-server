@@ -87,7 +87,7 @@ dashboardPage(skin = "purple",
                 
                 column(3,
                        wellPanel(
-                         h2("Liquor Explorer"),
+                         h2(span("Liquor Explorer", style = "color: #8fd6bd ; font-weight: bold;")),
                          h4("Showing me",strong(textOutput("n_liquor", inline = TRUE), 
                                                 style='color: orange;'), 
                             "different liquors", style = 'color: #1F77B4;'),
@@ -119,7 +119,7 @@ dashboardPage(skin = "purple",
       
       tabItem(tabName = "drink",
         tabBox(width = 12,
-          title = "Wine and Beer",
+          title = span("Wine and Beer", style = "color: #8fd6bd ; font-weight: bold;"),
           # The id lets us use input$tabset1 on the server to find the current tab
           id = "tabset1",
                

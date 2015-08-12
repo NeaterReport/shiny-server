@@ -30,3 +30,70 @@ p {
   -webkit-box-shadow: inset 0 0 0 0;
 box-shadow: inset 0 0 0 0
 }
+
+
+/* This is the active sidebar selection */
+.treeview .active {
+    background-color: #8fd6bd;;
+}
+
+/* The nav = top */
+.skin-purple .main-header .navbar .sidebar-toggle:hover {
+    color: #8fd6bd;
+    background: white;
+}
+
+/* this is the sidebar list color */
+.skin-purple .sidebar-menu>li.active>a, .skin-purple .sidebar-menu>li:hover>a {
+    color: #fff;
+    background: #9bcfe4;
+    border-left-color: #25a8a2
+}
+
+.skin-purple .sidebar-menu>li>.treeview-menu {
+    margin: 0 1px;
+    background: #9bcfe4;
+}
+
+/* the sidebar list color */
+.skin-purple .sidebar a {
+    color: #ce2d2d;
+}
+
+/* The tree color */
+.skin-purple .treeview-menu>li>a {
+    color: white;
+}
+
+.skin-purple .treeview-menu>li.active>a, .skin-purple .treeview-menu>li>a:hover {
+    color: #ce2d2d;
+}
+
+.skin-purple .main-header .navbar {
+  background-color: #8fd6bd;
+}
+
+.skin-purple .main-header .logo {
+    background-color: #8fd6bd;
+    color: #fff;
+    border-bottom: 0 solid transparent
+}
+
+.skin-purple .main-header .logo:hover {
+    color: #8fd6bd;
+    background: white;
+}
+
+.main-sidebar {
+  background-color: white !important;
+}
+
+.sidebar{
+  background-color: white;
+  color: #8fd6bd;
+}
+
+/* Tab top border color */
+.nav-tabs-custom>.nav-tabs>li.active {
+ border-top-color: #8fd6bd;
+}

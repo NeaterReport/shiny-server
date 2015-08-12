@@ -49,10 +49,10 @@ dashboardPage(skin = "purple",
               
         headerPanel(h3("CIHI Wait Time for ", 
                    span(textOutput("trt_selected", inline=TRUE), 
-                        style = "color: #2CA02C; font-weight: bold;"),
+                        style = "color: #8fd6bd ; font-weight: bold;"),
                    " in ", 
                    span(textOutput("prov_selected", inline=TRUE), 
-                        style = "color: #FF7F0E; font-weight: bold;"),
+                        style = "color: #9bcfe4; font-weight: bold;"),
                    imageOutput("image_flag", height=50)
                    ,align="center")),
         
@@ -112,7 +112,7 @@ dashboardPage(skin = "purple",
           fluidRow(
             column(width = 8,
                    h3(span(textOutput("trt_selected2", inline=TRUE), 
-                           style = "color: #FF7F0E; font-weight: bold;"), " Coming Soon!"),
+                           style = "color: #8fd6bd; font-weight: bold;"), " Coming Soon!"),
                    p("Each year, The Canadian Institute of Health Information (CIHI) releases wait time data on selected priority procedures and treatments. The Institute compiles this and other information to inform the general public on important health matters and shape public health policy.")
                    
             ),
