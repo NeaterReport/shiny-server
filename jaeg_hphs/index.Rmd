@@ -1,0 +1,544 @@
+---
+title: "HPHS Beta App"
+date: June 19, 2016
+output: 
+  flexdashboard::flex_dashboard:
+    vertical_layout: fill
+    theme: flatly
+runtime: shiny
+---
+
+
+```{r setup, include = FALSE}
+
+# Author: Benedito Chou & Emelie Gustafsson
+
+```
+
+```{r check, include = FALSE}
+
+# Check
+output$check <- renderPrint({
+  unique(prepre_df()$Organization)
+})
+
+```
+
+
+Transition to Value Quadrant
+=======================================================================
+
+Column
+-----------------------------------------------------------------------
+
+### Transition to Value Quandrant 
+
+```{r input_quadrant}
+
+fillCol(height = 600, flex = c(NA, 1), # NA sets natural height for inputs
+        
+  # Inputs
+  inputPanel(
+    
+    selectizeInput("year", label = "Year", 
+                   choices = c(2015, 2016), 
+                   selected = 2016),
+    
+    selectizeInput("organization", label = "Organization",
+                   choices = c("Select One")),
+    
+    selectizeInput("domain", label = "Domain",
+                   choices = c("All",
+                               "Management Structure",
+                               "Performance Management",
+                               "Patient Engagement",
+                               "Care Delivery"),
+                   selected = "All",
+                   multiple = TRUE),
+    
+    selectizeInput("capability", label = "Capability",
+                   choices = c("All",
+                               "Governance",
+                               "Leadership",
+                               "Analytical Data Systems ",
+                               "Financial Strategy",
+                               "Personnel and Care Settings",
+                               "Care Management",
+                               "Clinical Data Systems ",
+                               "Patient/Provider Partnership",
+                               "Patient Empowerment"),
+                   selected = "All",
+                   multiple = TRUE),
+    
+    selectizeInput("competency_quad", label = "Competency",
+                   choices = c("All",
+                               "Clarity of Mission (CM)",
+                               "Balanced Governance Structure (BGS)",
+                               "Provider Education (PED)",
+                               "Provider Engagement (PEN)",
+                               "Identification of Patient Health Needs (IPHN)",
+                               "Clinical Quality and Health Outcomes Measurement (CQHM)",
+                               "Practice Pattern Analysis (PPA)",
+                               "Budgeting and Capital Planning (BCP)",
+                               "Contracting (C)",
+                               "Compensation Alignment (CA)",
+                               "Appropriate Mix of Providers and Care Settings (APCS)",
+                               "Care Guidelines (CG)",
+                               "Care Decision Support (CDS)",
+                               "Patient Activation (PA)",
+                               "Patient Self-Management (PSM)",
+                               "Patient Education (PE)"),
+                   selected = "All",
+                   multiple = TRUE),
+    
+        selectizeInput("role", label = "Role",
+                   choices = c("Overall",
+                               "Executive Leader",
+                               "Board Member",
+                               "Senior Leader",
+                               "Business or Clinical Leader",
+                               "Direct Care Provider",
+                               "Other"),                                  
+                   selected = "Overall",
+                   multiple = TRUE)
+  ),
+  
+  # Quadrant Plot
+  plotlyOutput("graph_quadrant", height = "100%")
+
+)
+
+```
+
+
+```{r data_filter, include=FALSE}
+
+# An elegant multi-stage data filter design, inspired by JAEG!
+
+# First Stage filter
+pre_df <- reactive({
+  
+  df <- filter(core_survey_df, Year == input$year)
+  
+  if (is.null(input$domain)) {
+    df <- df
+  } else if (input$domain != "All") {
+    df <- filter(df, Domain %in% input$domain)
+  }
+  
+  if (is.null(input$capability)) {
+    df <- df
+  } else if (input$capability != "All") {
+    df <- filter(df, Capability %in% input$capability)
+  } 
+
+  if (is.null(input$competency_quad)) {
+    df <- df
+  } else if (input$competency_quad != "All") {
+    df <- filter(df, Competency %in% input$competency_quad)
+  }
+  
+  return(df)
+})
+
+
+# Second Stage Filter
+survey1_df <- reactive({
+  
+  df <- pre_df()
+  
+  if (!is.null(input$organization) || input$organization != "Select One") {
+    df <- filter(df, Organization == input$organization)
+  }
+  
+})
+
+# Third Stage Filter
+survey2_df <- reactive({
+  
+  df <- survey1_df()
+  
+  if (is.null(input$role)) {
+    df <- df 
+  } else if (!is.null(input$role)) {
+    df <- filter(df, EvaluatorRole %in% input$role)
+  }
+})
+
+
+# Update Filters
+observeEvent(input$year, {
+  org <- unique(pre_df()$Organization)
+  updateSelectizeInput(session, "organization", choices = org)
+})
+
+observeEvent(input$organization, {
+  role <- unique(survey1_df()$EvaluatorRole)
+  updateSelectizeInput(session, "role", choices = role, selected = "Overall")
+})
+
+```
+
+```{r graph_quadrant}
+
+output$graph_quadrant <- renderPlotly({
+  
+  df <- survey2_df()
+  
+  key <- row.names(df)
+  
+  # d <- event_data("plotly_hover")
+  
+  req(survey2_df()) 
+  
+  # if (!is.null(d$key)) {
+  # df$EvaluatorRole <- ifelse(row.names(df) == d$key, "Yes", "No")
+  # } else {
+  # df <- df
+  # }
+  
+  # Basic Scatterplot
+  g <- ggplot(df, aes(x= ProficiencyM, y = PriorityM, fill = EvaluatorRole,
+                      key = key,
+                       text = paste("Question: ", QuestionCode,
+                                    "<br>Competency: ", Competency,
+                                    "<br>Proficiency: ", round(ProficiencyM, 1),
+                                    "<br>Priority: ", round(PriorityM, 1),
+                                    "<br>Rank: ", `Priority Rank`))) +
+    geom_hline(aes(yintercept = mean(PriorityM, na.rm = T)), color = "#a8ddb5", alpha = 1/2) + 
+    geom_vline(aes(xintercept = mean(ProficiencyM, na.rm = T)), color = "#a8ddb5", alpha = 1/2) + 
+    geom_point(color = "darkgrey", alpha = 2/3, size = 3, shape = 21) + 
+    theme_minimal() +
+    ggtitle(unique(df$Organization)) +
+    theme(legend.position = "none",
+          axis.text = element_text(colour = "darkgrey"),
+          axis.title = element_text(colour = "darkgrey")) +
+    scale_x_continuous(breaks=c(1, 9), limits = c(1, 9)) +
+    scale_y_continuous(breaks=c(1, 5), limits = c(1, 5)) +
+    scale_fill_manual(values=c("#8dd3c7","#ffffb3","#bebada", "#fb8072","#80b1d3", "#fdb462", "#b3de69", "#fccde5", "#d9d9d9", "#bc80bd")) +
+    labs(x = "Average Proficiency",
+         y = "Average Priority") # Doesnt seem to work with plolty
+  
+   # stat_ellipse(geom = "polygon", alpha = 1/10) + # too few points
+  
+   # plot_ly axis options
+   ax <- list(
+    zeroline = FALSE,
+    showline = FALSE,
+    showticklabels = TRUE,
+    showgrid = FALSE
+    )
+  
+  ggplotly(g, tooltip = "text") %>%
+    layout(xaxis = ax, yaxis = ax)
+
+})
+
+# Plotly events listeners
+output$hover <- renderPrint({
+  d <- event_data("plotly_hover")
+  if (is.null(d)) "Hover events appear here (unhover to clear)" else d
+})
+
+output$click <- renderPrint({
+  d <- event_data("plotly_click")
+  if (is.null(d)) "Click events appear here (double-click to clear)" else d
+})
+
+output$brush <- renderPrint({
+  d <- event_data("plotly_selected")
+  if (is.null(d)) "Click and drag events (i.e., select/lasso) appear here (double-click to clear)" else d
+})
+
+output$zoom <- renderPrint({
+  d <- event_data("plotly_relayout")
+  if (is.null(d)) "Relayout (i.e., zoom) events appear here" else d
+})
+
+```
+
+
+Column
+-----------------------------------------------------------------------
+
+### Priority Rank
+
+```{r graph_priority}
+
+renderPlotly({
+
+df <- survey2_df()
+
+d <- event_data("plotly_hover")
+
+req(survey2_df())  
+
+# key <- row.names(df)
+
+if (!is.null(d$key)) {
+df$highlight <- ifelse(row.names(df) == d$key, "Yes", "No")
+} else {
+df$highlight <- "No"
+}
+
+g <- ggplot(df, aes(`Priority Rank`, group, fill = highlight,
+                    text = paste("Competency: ", Competency,
+                                 "<br>Question: ", QuestionCode,
+                                 "<br>Rank: ", `Priority Rank`))) +
+  geom_point(size = 9, alpha = 2/3, shape = 22) +
+  geom_text(aes(label = QuestionCode), size = 2) +
+  theme_minimal() +
+  theme(legend.position="none",
+        panel.grid = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text = element_text(colour = "darkgrey"),
+        axis.title.x = element_text(colour = "darkgrey")) +
+  scale_x_continuous(breaks=seq_along(1:30)) +
+  labs(x = "Alignment Priority Rank") +
+  scale_fill_manual(values = c("#f7f7f7", "#a8ddb5"))
+
+ggplotly(g, tooltip = "text")
+
+})
+
+```
+
+
+Response Distribution
+=======================================================================
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+
+```{r input_bar}
+
+inputPanel(
+  
+   selectizeInput("year_bar", label = "Year", 
+                   choices = c(2015, 2016), 
+                   selected = 2016),
+   
+    selectizeInput("org", label = "Organization",
+                   choices = c("Select One")),
+   
+    selectizeInput("quadrant", label = "Transition to Value Quadrant",
+                   choices = c("All",
+                               "FCI",
+                               "RFI",
+                               "CIRR",
+                               "CVAM"),
+                   selected = "All"),
+   
+    selectizeInput("competency_bar", label = "Competency",
+                   choices = c("All",
+                               "Clarity of Mission (CM)",
+                               "Balanced Governance Structure (BGS)",
+                               "Provider Education (PED)",
+                               "Provider Engagement (PEN)",
+                               "Identification of Patient Health Needs (IPHN)",
+                               "Clinical Quality and Health Outcomes Measurement (CQHM)",
+                               "Practice Pattern Analysis (PPA)",
+                               "Budgeting and Capital Planning (BCP)",
+                               "Contracting (C)",
+                               "Compensation Alignment (CA)",
+                               "Appropriate Mix of Providers and Care Settings (APCS)",
+                               "Care Guidelines (CG)",
+                               "Care Decision Support (CDS)",
+                               "Patient Activation (PA)",
+                               "Patient Self-Management (PSM)",
+                               "Patient Education (PE)"),
+                   select = "All"),
+   
+    selectizeInput("driver", label = "Driver",
+                   choices = c("All",
+                            "CM1","BGS1","BGS2","BGS3","BGS4","PED1","PED2","PED3","PEN1","PEN2", "CDS1", "CDS2", "CDS3", "IPHN1", "IPHN2", "CQHM1", "CQHM2", "PPA1", "PPA2", "BCP1", "BCP2", "BCP3", "C1", "C2", "CA1", "CA2", "CA3", "APCS1", "APCS2", "APCS3", "CG1", "CG2", "CG3", "CG4", "CG5", "CG6", "PA1", "PA2", "PSM1", "PSM2", "PE1", "PE2"),
+                   selected = "All"),
+   
+    selectizeInput("question_type", label = "Question Type",
+                   choices = c("Proficiency" = "Proficiency", 
+                               "Priority" = "Priority_Q"),
+                   selected = "Proficiency")
+)
+
+```
+
+
+```{r master_data, include = FALSE}
+
+# An elegant multi-stage data filter design, inspired by JAEG!
+
+# Pre Pre Filter
+prepre_df <- reactive({
+    df <- filter(master_survey_df, Year == input$year_bar)
+})
+
+# Pre Pre 2 Filter
+prepre2_df <- reactive({
+  df <- isolate(prepre_df())
+  if (!is.null(input$org) || input$org != "Select One") {
+    df <- filter(df, Organization == input$org)
+  }
+})
+
+# Quandrant Scoring
+scored_df <- reactive({
+  
+  df <- prepre2_df()
+
+  # Calculate overall mean and SD
+  df <- mutate(df, overAllM_proficiency = mean(Proficiency, na.rm = T), 
+             overAllSD_proficiency = sd(Proficiency, na.rm = T),
+             overAllM_priority = mean(Priority_Q, na.rm = T),
+             overAllSD_priority = sd(Priority_Q, na.rm = T))
+  
+  # Summarize by question
+  df_group <- group_by(df, QuestionCode) %>%
+  dplyr::summarize(ProficiencyM = mean(Proficiency, na.rm = T),
+            PriorityM = mean(Priority_Q, na.rm = T),
+            overAllM_proficiency = mean(overAllM_proficiency),
+            overAllSD_proficiency = mean(overAllSD_proficiency),
+            overAllM_priority = mean(overAllM_priority),
+            overAllSD_priority = mean(overAllSD_priority)) %>%
+  dplyr::mutate(quadrant = ifelse(ProficiencyM <= overAllM_proficiency & PriorityM > overAllM_priority, "RFI", ""),
+         quadrant = ifelse(ProficiencyM > overAllM_proficiency & PriorityM > overAllM_priority, "FCI", quadrant),
+         quadrant = ifelse(ProficiencyM > overAllM_proficiency & PriorityM <= overAllM_priority, "CIRR", quadrant),
+         quadrant = ifelse(ProficiencyM <= overAllM_proficiency & PriorityM <= overAllM_priority, "CVAM", quadrant))
+  
+  # Join data back with main data
+  df <- inner_join(df, df_group, by = "QuestionCode")
+  
+})
+
+
+pre_master_df <- reactive({
+  
+  df <- scored_df()
+  
+  if (is.null(input$quadrant)) {
+    df <- df
+  } else if (input$quadrant != "All") {
+    df <- filter(df, quadrant %in% input$quadrant)
+  }
+
+  if (input$competency_bar == "All") {
+    df <- df
+  } else if (input$competency_bar != "All") {
+    df <- filter(df, Competency %in% input$competency_bar)
+  }
+  
+})
+
+master_df <- reactive({
+  
+  df <- pre_master_df()
+
+  if (input$driver == "All") {
+    df <- df
+  } else if (input$driver != "All") {
+    df <- filter(df, QuestionCode %in% input$driver)
+  }
+  
+})
+
+
+# Update Filters
+observeEvent(input$year_bar, {
+  org <- sort(unique(prepre_df()$Organization))
+  updateSelectizeInput(session, "org", choices = org)
+})
+
+observeEvent(input$quadrant, {
+  competency <- unique(pre_master_df()$Competency)
+  updateSelectizeInput(session, "competency_bar", choices = c("All", competency))
+})
+
+observeEvent(input$competency_bar, {
+  driver <- unique(pre_master_df()$QuestionCode)
+  updateSelectizeInput(session, "driver", choices = c("All", driver))
+})
+
+```
+
+
+Column
+-----------------------------------------------------------------------
+
+### Response Distribution
+
+```{r graph_resp}
+
+plotlyOutput("graph_resp", height = "100%")
+
+output$graph_resp <- renderPlotly({
+   
+  if (input$question_type == "Proficiency") {
+    g <- ggplot(master_df(), aes(x = Proficiency, fill = as.factor(Proficiency)))
+  } else if (input$question_type == "Priority_Q") {
+    g <- ggplot(master_df(), aes(x = Priority_Q, fill = as.factor(Priority_Q)))
+  }
+  
+  g <- g + geom_bar(aes(y = (..count..)/sum(..count..),
+                        text = paste0("Percent: ", round((..count..)/sum(..count..) * 100), "%"))) +
+       theme_minimal() + 
+       theme(axis.title = element_blank(),
+            axis.text = element_text(colour = "darkgrey"),
+            axis.title.x = element_text(colour = "darkgrey")) +
+       scale_x_discrete(limits=1:9) +
+       scale_y_continuous(labels = percent_format()) +
+       scale_fill_brewer(direction = 1, guide = FALSE)
+  
+  ggplotly(g, tooltip = "text") %>% 
+    layout(xaxis = list(showgrid = FALSE))
+
+
+})
+
+```
+
+
+Column
+-----------------------------------------------------------------------
+
+### Response by Role
+
+```{r graph_resp_by_role}
+
+plotlyOutput("graph_resp_by_role", height = "100%")
+
+output$graph_resp_by_role <- renderPlotly({
+  
+  if (input$question_type == "Proficiency") {
+    df <- filter(master_df(), complete.cases(Proficiency)) %>% select(Proficiency, EvaluatorRole)
+  } else if (input$question_type == "Priority_Q") {
+    df <- filter(master_df(), complete.cases(Priority_Q)) %>% select(Priority_Q, EvaluatorRole)
+  }
+  
+  # see http://stackoverflow.com/questions/34903368/how-to-center-stacked-percent-barchart-labels-in-ggplot2
+
+  df <- group_by_(df, "EvaluatorRole", input$question_type) %>%
+  summarise(n = n()) %>%
+  mutate(percent = n/sum(n),
+         pos = cumsum(percent) - 0.5 * percent)
+  
+  names(df)[2] <- "question_type"
+
+ g <- ggplot(df, aes(x = EvaluatorRole, y = percent, fill = as.factor(question_type),
+             text = paste0("Percent: ", round(percent * 100), "%"))) +
+  geom_bar(stat="identity", width = .9, position = "fill") +
+  coord_flip() +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        axis.text = element_text(colour = "darkgrey"),
+        axis.title.x = element_text(colour = "darkgrey")) +
+  scale_y_continuous(labels = percent_format()) +
+  scale_fill_brewer(direction = 1, guide = FALSE)
+  
+  ggplotly(g, tooltip = "text") %>%
+    layout(yaxis = list(showgrid = FALSE))
+
+})
+
+
+```
+
+
