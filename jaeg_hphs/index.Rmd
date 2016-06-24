@@ -1,6 +1,6 @@
 ---
 title: "HPHS Beta App"
-date: June 19, 2016
+date: June 24, 2016
 output: 
   flexdashboard::flex_dashboard:
     vertical_layout: fill
@@ -25,13 +25,156 @@ output$check <- renderPrint({
 ```
 
 
-Transition to Value Quadrant
+Transition to Value Quadrant (Text)
 =======================================================================
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+
+```{r input_quadrant_txt}
+
+fillCol(height = 600, flex = c(NA, 1), # NA sets natural height for inputs
+        
+  # Inputs
+  inputPanel(
+    
+    selectizeInput("year_txt", label = "Year", 
+                   choices = c(2015, 2016), 
+                   selected = 2016),
+    
+    selectizeInput("organization_txt", label = "Organization",
+                   choices = c("Select One"))
+  )
+
+)
+
+```
+
+```{r comp_quadrant}
+
+  # Keep only overall
+  quadrant_pre_df <- reactive({
+    df <- filter(core_survey_df, EvaluatorRole == "Overall", Year == input$year_txt)
+  })
+
+# Update Filters
+observeEvent(input$year_txt, {
+  org <- unique(quadrant_pre_df()$Organization)
+  updateSelectizeInput(session, "organization_txt", choices = org)
+})
+
+ quadrant_txt_df <- reactive({
+   
+   df <- filter(quadrant_pre_df(), Organization == input$organization_txt)
+
+ # Calculate overall mean and SD
+  df <- mutate(df, overAllM_proficiency = mean(ProficiencyM, na.rm = T), 
+             overAllM_priority = mean(PriorityM, na.rm = T))
+  
+  # Summarize by competency
+  df_group <- group_by(df, Competency) %>%
+    dplyr::summarize(ProficiencyM = mean(ProficiencyM, na.rm = T),
+            PriorityM = mean(PriorityM, na.rm = T),
+            overAllM_proficiency = mean(overAllM_proficiency),
+            overAllM_priority = mean(overAllM_priority)) %>%
+    dplyr::mutate(quadrant = ifelse(ProficiencyM <= overAllM_proficiency & PriorityM > overAllM_priority, "RFI", ""),
+         quadrant = ifelse(ProficiencyM > overAllM_proficiency & PriorityM > overAllM_priority, "FCI", quadrant),
+         quadrant = ifelse(ProficiencyM > overAllM_proficiency & PriorityM <= overAllM_priority, "CIRR", quadrant),
+         quadrant = ifelse(ProficiencyM <= overAllM_proficiency & PriorityM <= overAllM_priority, "CVAM", quadrant))
+  
+  })
+
+```
 
 Column
 -----------------------------------------------------------------------
 
-### Transition to Value Quandrant 
+### Ready for Improvment (RFI) (Motivated to act, limited ability)
+
+```{r RFI}
+
+renderUI({
+
+RFI_list <- filter(quadrant_txt_df(), quadrant == "RFI") %>% select(Competency)
+
+RFI_head <- NULL
+for (i in RFI_list) {
+  RFI_head <- paste0("<h3>",i,"</h3>")
+}
+
+HTML(RFI_head)
+
+})
+
+
+```
+
+### Communicate Vistion, Align & Motivate (CVAM) (Not motivated or able)
+
+```{r CVAM}
+
+renderUI({
+  
+CVAM_list <- filter(quadrant_txt_df(), quadrant == "CVAM") %>% select(Competency)
+
+CVAM_head <- NULL
+for (i in CVAM_list) {
+  CVAM_head <- paste0("<h3>",i,"</h3>")
+}
+
+HTML(CVAM_head)
+
+})
+
+```
+
+Column
+-----------------------------------------------------------------------
+
+### Focus on Continuous Improvement (FCI) (Motivated and able)
+
+```{r FCI}
+
+renderUI({
+  
+FCI_list <- filter(quadrant_txt_df(), quadrant == "FCI") %>% select(Competency)
+
+FCI_head <- NULL
+for (i in FCI_list) {
+  FCI_head <- paste0("<h3>",i,"</h3>")
+}
+
+HTML(FCI_head)
+
+})
+
+```
+
+### Clarify Importance or Redirect Resources (CIRR) (Capable but not a high priority)
+
+```{r CIRR}
+
+renderUI({
+  
+CIRR_list <- filter(quadrant_txt_df(), quadrant == "CIRR") %>% select(Competency)
+
+CIRR_head <- NULL
+for (i in CIRR_list) {
+  CIRR_head <- paste0("<h3>",i,"</h3>")
+}
+
+HTML(CIRR_head)
+
+})
+
+```
+
+Transition to Value Quadrant
+=======================================================================
+
+
+Column {.sidebar}
+-----------------------------------------------------------------------
 
 ```{r input_quadrant}
 
@@ -40,33 +183,12 @@ fillCol(height = 600, flex = c(NA, 1), # NA sets natural height for inputs
   # Inputs
   inputPanel(
     
-    selectizeInput("year", label = "Year", 
-                   choices = c(2015, 2016), 
-                   selected = 2016),
-    
-    selectizeInput("organization", label = "Organization",
-                   choices = c("Select One")),
-    
     selectizeInput("domain", label = "Domain",
                    choices = c("All",
                                "Management Structure",
                                "Performance Management",
                                "Patient Engagement",
                                "Care Delivery"),
-                   selected = "All",
-                   multiple = TRUE),
-    
-    selectizeInput("capability", label = "Capability",
-                   choices = c("All",
-                               "Governance",
-                               "Leadership",
-                               "Analytical Data Systems ",
-                               "Financial Strategy",
-                               "Personnel and Care Settings",
-                               "Care Management",
-                               "Clinical Data Systems ",
-                               "Patient/Provider Partnership",
-                               "Patient Empowerment"),
                    selected = "All",
                    multiple = TRUE),
     
@@ -91,25 +213,22 @@ fillCol(height = 600, flex = c(NA, 1), # NA sets natural height for inputs
                    selected = "All",
                    multiple = TRUE),
     
-        selectizeInput("role", label = "Role",
-                   choices = c("Overall",
-                               "Executive Leader",
-                               "Board Member",
-                               "Senior Leader",
-                               "Business or Clinical Leader",
-                               "Direct Care Provider",
-                               "Other"),                                  
-                   selected = "Overall",
-                   multiple = TRUE)
-  ),
-  
-  # Quadrant Plot
-  plotlyOutput("graph_quadrant", height = "100%")
+    selectizeInput("year", label = "Year", 
+                   choices = c(2015, 2016), 
+                   selected = 2016),
+    
+    selectizeInput("organization", label = "Organization",
+                   choices = c("Select One"))
+  )
 
 )
 
 ```
 
+Column
+-----------------------------------------------------------------------
+
+### Transition to Value Quandrant 
 
 ```{r data_filter, include=FALSE}
 
@@ -118,19 +237,14 @@ fillCol(height = 600, flex = c(NA, 1), # NA sets natural height for inputs
 # First Stage filter
 pre_df <- reactive({
   
-  df <- filter(core_survey_df, Year == input$year)
+  df <- filter(core_survey_df, Year == input$year,
+               EvaluatorRole == "Overall")
   
   if (is.null(input$domain)) {
     df <- df
   } else if (input$domain != "All") {
     df <- filter(df, Domain %in% input$domain)
   }
-  
-  if (is.null(input$capability)) {
-    df <- df
-  } else if (input$capability != "All") {
-    df <- filter(df, Capability %in% input$capability)
-  } 
 
   if (is.null(input$competency_quad)) {
     df <- df
@@ -143,7 +257,7 @@ pre_df <- reactive({
 
 
 # Second Stage Filter
-survey1_df <- reactive({
+survey_df <- reactive({
   
   df <- pre_df()
   
@@ -153,18 +267,6 @@ survey1_df <- reactive({
   
 })
 
-# Third Stage Filter
-survey2_df <- reactive({
-  
-  df <- survey1_df()
-  
-  if (is.null(input$role)) {
-    df <- df 
-  } else if (!is.null(input$role)) {
-    df <- filter(df, EvaluatorRole %in% input$role)
-  }
-})
-
 
 # Update Filters
 observeEvent(input$year, {
@@ -172,30 +274,31 @@ observeEvent(input$year, {
   updateSelectizeInput(session, "organization", choices = org)
 })
 
-observeEvent(input$organization, {
-  role <- unique(survey1_df()$EvaluatorRole)
-  updateSelectizeInput(session, "role", choices = role, selected = "Overall")
-})
-
 ```
 
 ```{r graph_quadrant}
 
+# Quadrant Plot
+plotlyOutput("graph_quadrant", height = "100%")
+
 output$graph_quadrant <- renderPlotly({
   
-  df <- survey2_df()
+  df <- survey_df()
   
   key <- row.names(df)
   
   # d <- event_data("plotly_hover")
   
-  req(survey2_df()) 
+  req(survey_df()) 
   
   # if (!is.null(d$key)) {
   # df$EvaluatorRole <- ifelse(row.names(df) == d$key, "Yes", "No")
   # } else {
   # df <- df
   # }
+  
+  # Get overall proficiency and priority score for benchmark line
+  overall_df <- filter(core_survey_df, Organization == "Overall")
   
   # Basic Scatterplot
   g <- ggplot(df, aes(x= ProficiencyM, y = PriorityM, fill = EvaluatorRole,
@@ -205,16 +308,19 @@ output$graph_quadrant <- renderPlotly({
                                     "<br>Proficiency: ", round(ProficiencyM, 1),
                                     "<br>Priority: ", round(PriorityM, 1),
                                     "<br>Rank: ", `Priority Rank`))) +
-    geom_hline(aes(yintercept = mean(PriorityM, na.rm = T)), color = "#a8ddb5", alpha = 1/2) + 
-    geom_vline(aes(xintercept = mean(ProficiencyM, na.rm = T)), color = "#a8ddb5", alpha = 1/2) + 
+    geom_hline(aes(yintercept = mean(PriorityM, na.rm = T)), color = "orange", alpha = 1/2) + 
+    geom_vline(aes(xintercept = mean(ProficiencyM, na.rm = T)), color = "orange", alpha = 1/2) + 
+    geom_hline(data = overall_df, aes(yintercept = mean(PriorityM, na.rm = T)), color = "#a8ddb5", alpha = 2/3, linetype="dotted") + 
+    geom_vline(data = overall_df, aes(xintercept = mean(ProficiencyM, na.rm = T)), color = "#a8ddb5", alpha = 2/3, linetype="dotted") + 
     geom_point(color = "darkgrey", alpha = 2/3, size = 3, shape = 21) + 
     theme_minimal() +
     ggtitle(unique(df$Organization)) +
     theme(legend.position = "none",
           axis.text = element_text(colour = "darkgrey"),
-          axis.title = element_text(colour = "darkgrey")) +
-    scale_x_continuous(breaks=c(1, 9), limits = c(1, 9)) +
-    scale_y_continuous(breaks=c(1, 5), limits = c(1, 5)) +
+          axis.title = element_text(colour = "darkgrey"),
+          panel.grid = element_line(colour = 'lightgrey', linetype = 'dotted')) +
+    scale_x_continuous(breaks=c(1,2,3,4,5,6,7,8,9), limits = c(1, 9)) +
+    scale_y_continuous(breaks=c(1,2,3,4,5), limits = c(1, 5)) +
     scale_fill_manual(values=c("#8dd3c7","#ffffb3","#bebada", "#fb8072","#80b1d3", "#fdb462", "#b3de69", "#fccde5", "#d9d9d9", "#bc80bd")) +
     labs(x = "Average Proficiency",
          y = "Average Priority") # Doesnt seem to work with plolty
@@ -226,7 +332,9 @@ output$graph_quadrant <- renderPlotly({
     zeroline = FALSE,
     showline = FALSE,
     showticklabels = TRUE,
-    showgrid = FALSE
+    showgrid = TRUE,
+    gridcolor = '#eee',
+    gridwidth = 1
     )
   
   ggplotly(g, tooltip = "text") %>%
@@ -258,20 +366,22 @@ output$zoom <- renderPrint({
 ```
 
 
+
+
 Column
 -----------------------------------------------------------------------
 
-### Priority Rank
+### Recommended Action Plan
 
 ```{r graph_priority}
 
 renderPlotly({
 
-df <- survey2_df()
+df <- survey_df()
 
 d <- event_data("plotly_hover")
 
-req(survey2_df())  
+req(survey_df())  
 
 # key <- row.names(df)
 
@@ -281,21 +391,56 @@ df$highlight <- ifelse(row.names(df) == d$key, "Yes", "No")
 df$highlight <- "No"
 }
 
-g <- ggplot(df, aes(`Priority Rank`, group, fill = highlight,
-                    text = paste("Competency: ", Competency,
+# Find out the max number of rank item
+maxrank <- group_by(df, group) %>%
+  summarize(maxrank = max(`Priority Rank`, na.rm = T)) %>%
+  ungroup() %>%
+  summarize(max(maxrank, na.rm = T)) %>% as.numeric()
+
+# Create x-axis label
+axis_label <- 1:maxrank
+
+# Insert Priority Text
+axis_label[2] <- "2<br>Highest Priority"
+axis_label[maxrank - 1] <- paste0(max(maxrank) - 1,"<br>Lowest Priority")
+
+df$fakeheight <- 100
+
+g <- ggplot(df, aes(as.factor(`Priority Rank`), fakeheight, fill = highlight,
+                      text = paste("Competency: ", Competency,
                                  "<br>Question: ", QuestionCode,
-                                 "<br>Rank: ", `Priority Rank`))) +
-  geom_point(size = 9, alpha = 2/3, shape = 22) +
-  geom_text(aes(label = QuestionCode), size = 2) +
+                                 "<br>Statement: ", Statement,
+                                 "<br>Quadrant Rank: ", `Priority Rank`))) +
+        geom_bar(stat = "identity", width = .6) + 
+  facet_grid(group~.) +
+  geom_text(aes(label = QuestionCode), size = 2, nudge_y = -5) +
   theme_minimal() +
   theme(legend.position="none",
         panel.grid = element_blank(),
         axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
         axis.text = element_text(colour = "darkgrey"),
         axis.title.x = element_text(colour = "darkgrey")) +
-  scale_x_continuous(breaks=seq_along(1:30)) +
-  labs(x = "Alignment Priority Rank") +
+  scale_x_discrete(breaks=seq_along(1:maxrank), labels = axis_label) +
+  labs(x = "Recommended Priorities by Quadrant and Driver") +
   scale_fill_manual(values = c("#f7f7f7", "#a8ddb5"))
+
+# g <- ggplot(df, aes(`Priority Rank`, group, fill = highlight,
+#                     text = paste("Competency: ", Competency,
+#                                  "<br>Question: ", QuestionCode,
+#                                  "<br>Statement: ", Statement,
+#                                  "<br>Quadrant Rank: ", `Priority Rank`))) +
+#   geom_point(size = 7, alpha = 2/3, shape = 22) +
+#   geom_text(aes(label = QuestionCode), size = 2) +
+#   theme_minimal() +
+#   theme(legend.position="none",
+#         panel.grid = element_blank(),
+#         axis.title.y = element_blank(),
+#         axis.text = element_text(colour = "darkgrey"),
+#         axis.title.x = element_text(colour = "darkgrey")) +
+#   scale_x_continuous(breaks=seq_along(1:maxrank), labels = axis_label) +
+#   labs(x = "Recommended Priorities by Quadrant and Driver") +
+#   scale_fill_manual(values = c("#f7f7f7", "#a8ddb5"))
 
 ggplotly(g, tooltip = "text")
 
@@ -470,24 +615,33 @@ Column
 plotlyOutput("graph_resp", height = "100%")
 
 output$graph_resp <- renderPlotly({
-   
+  
+  # Pre summarize it
+  df <- group_by_(master_df(), input$question_type) %>%
+  summarise(n = n()) %>%
+  mutate(percent = n/sum(n),
+         pos = percent + .002)
+  
   if (input$question_type == "Proficiency") {
-    g <- ggplot(master_df(), aes(x = Proficiency, fill = as.factor(Proficiency)))
+    df <- filter(df, complete.cases(Proficiency))
+    g <- ggplot(df, aes(x = Proficiency, y = percent, fill = as.factor(Proficiency)))
   } else if (input$question_type == "Priority_Q") {
-    g <- ggplot(master_df(), aes(x = Priority_Q, fill = as.factor(Priority_Q)))
+        df <- filter(df, complete.cases(Priority_Q))
+    g <- ggplot(df, aes(x = Priority_Q, y = percent, fill = as.factor(Priority_Q)))
   }
+
+  g <- g + geom_bar(data = df, stat = "identity",
+           aes(text = paste0("Percent: ", scales::percent(percent), "%"))) +
+  geom_text(aes(label = scales::percent(percent), y = pos)) +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        axis.text = element_text(colour = "darkgrey"),
+        axis.title.x = element_text(colour = "darkgrey")) +
+  scale_x_discrete(limits=1:9) +
+  scale_y_continuous(labels = percent_format()) +
+  scale_fill_brewer(direction = 1, guide = FALSE)
   
-  g <- g + geom_bar(aes(y = (..count..)/sum(..count..),
-                        text = paste0("Percent: ", round((..count..)/sum(..count..) * 100), "%"))) +
-       theme_minimal() + 
-       theme(axis.title = element_blank(),
-            axis.text = element_text(colour = "darkgrey"),
-            axis.title.x = element_text(colour = "darkgrey")) +
-       scale_x_discrete(limits=1:9) +
-       scale_y_continuous(labels = percent_format()) +
-       scale_fill_brewer(direction = 1, guide = FALSE)
-  
-  ggplotly(g, tooltip = "text") %>% 
+  ggplotly(g, tooltip = "text") %>%
     layout(xaxis = list(showgrid = FALSE))
 
 
@@ -525,6 +679,8 @@ output$graph_resp_by_role <- renderPlotly({
  g <- ggplot(df, aes(x = EvaluatorRole, y = percent, fill = as.factor(question_type),
              text = paste0("Percent: ", round(percent * 100), "%"))) +
   geom_bar(stat="identity", width = .9, position = "fill") +
+  geom_text(aes(label=ifelse(percent >= 0.07, paste0(sprintf("%.0f", percent*100),"%"),""),
+                y=pos), colour="white") +
   coord_flip() +
   theme_minimal() +
   theme(axis.title = element_blank(),
@@ -542,3 +698,50 @@ output$graph_resp_by_role <- renderPlotly({
 ```
 
 
+
+Comments
+=======================================================================
+
+Column {.sidebar}
+-----------------------------------------------------------------------
+
+```{r input_comment}
+
+inputPanel(
+  
+   selectizeInput("year_comment", label = "Year", 
+                   choices =  2016, 
+                   selected = 2016),
+   
+    selectizeInput("org_comment", label = "Organization",
+                   choices = unique(as.character(master_comment_2016$Organization)))
+)
+
+```
+
+Column
+-----------------------------------------------------------------------
+
+### Comment
+
+```{r comment_table}
+
+renderDataTable({
+  
+  df <- filter(master_comment_2016, Organization == input$org_comment)
+  
+  df_long <- tidyr::gather(df, Section, Comment, CMTXT:FTRPRIOTXT) %>% 
+    filter(Comment != "") %>% 
+    select(Section, Comment) %>% 
+    arrange(Section)
+  
+  df_long <- inner_join(df_long, text_label, by = c("Section" = "Code")) %>%
+    select(-Section) %>%
+    rename(Section = Label)
+
+  datatable(df_long)
+  
+})
+
+
+```
