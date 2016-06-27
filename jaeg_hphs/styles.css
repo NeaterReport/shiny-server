@@ -1,0 +1,15 @@
+/* Custom css, so stylish like JAEG */
+
+.chart-title {
+  font-size: 20pt;
+}
+
+h4 {
+  color: #2166ac;
+}
+
+
+iframe{
+  display: block;
+  margin: auto auto;
+}
